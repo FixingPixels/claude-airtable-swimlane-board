@@ -1,0 +1,15 @@
+Key,Summary,Epic Key,Epic,Type,Status,Priority,Assignee,Requester,Labels,Details,Links,Rank,Related
+WEB-1,Agree the sitemap and page list,DESIGN,Design,Task,Done,High,Alex,Sam,planning,Eight pages agreed. Blog moves to phase two.,,1,
+WEB-2,Design the homepage,DESIGN,Design,Feature,In Review,High,Alex,Sam,homepage,Desktop and mobile mocks are ready for sign-off.,https://example.com/mocks/homepage,2,WEB-5; WEB-9
+WEB-3,Design the pricing page,DESIGN,Design,Feature,In Progress,Medium,Alex,Sam,pricing,"Three plans side by side, with a comparison table underneath.",,3,
+WEB-4,Pick the typeface and colour palette,DESIGN,Design,Decision,Done,Medium,Alex,,brand,"Decided: one serif for headings, one sans for text, four colours.",,4,
+WEB-5,Write homepage copy,CONTENT,Content,Task,In Progress,High,Sam,,homepage; copy,"Headline, three benefit blocks, and the call to action.",,5,
+WEB-6,Collect three customer quotes,CONTENT,Content,Task,To Do,Medium,Sam,,social-proof,Ask the customers from the spring case studies first.,,6,
+WEB-7,Rewrite the About page,CONTENT,Content,Task,To Do,,,Sam,copy,Untriaged: no priority and no assignee yet.,,7,
+WEB-8,Set up the staging site,BUILD,Build,Chore,Done,High,Jo,,infra,Staging is password-protected and rebuilds on every change.,https://example.com/staging,8,
+WEB-9,Build the homepage template,BUILD,Build,Feature,To Do,High,Jo,Alex,homepage,Starts once the homepage design is signed off.,,9,
+WEB-10,Contact form sends to the wrong inbox,BUILD,Build,Bug,In Progress,Highest,Jo,Sam,forms,Messages from the contact form land in the old support address.,,10,
+WEB-11,Add a dark mode toggle,BUILD,Build,Feature,Won't Do,Low,,Alex,,Out of scope for launch. Revisit afterwards.,,11,
+WEB-12,Redirect old URLs to new pages,LAUNCH,Launch,Task,To Do,High,Jo,,seo,Map every old address to its new page so search links keep working.,,12,
+WEB-13,Run the pre-launch checklist,LAUNCH,Launch,Task,To Do,Medium,,Sam,,"Forms, redirects, analytics, page titles, and a read-through on a phone.",,13,WEB-12
+WEB-14,Announce the new site,LAUNCH,Launch,Task,To Do,Low,Sam,,marketing,Email to customers plus one post on each social account.,,14,

@@ -1,0 +1,248 @@
+{
+  "_note": "Table and field definitions in the shape the Airtable connector's create_base tool expects. Table and field NAMES must stay exactly as written: the board finds them by name. Types may differ. Add the Epic Key choices for whatever epics the project uses.",
+  "tables": [
+    {
+      "name": "Tickets",
+      "description": "One row per ticket. Key is the stable identity; Rank orders cards inside a board cell.",
+      "fields": [
+        {
+          "name": "Key",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Summary",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Epic Key",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "DESIGN"
+              },
+              {
+                "name": "CONTENT"
+              },
+              {
+                "name": "BUILD"
+              },
+              {
+                "name": "LAUNCH"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Epic",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Type",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "Task"
+              },
+              {
+                "name": "Bug"
+              },
+              {
+                "name": "Feature"
+              },
+              {
+                "name": "Chore"
+              },
+              {
+                "name": "Decision"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Status",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "To Do"
+              },
+              {
+                "name": "In Progress"
+              },
+              {
+                "name": "In Review"
+              },
+              {
+                "name": "Done"
+              },
+              {
+                "name": "Won't Do"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Priority",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "Highest"
+              },
+              {
+                "name": "High"
+              },
+              {
+                "name": "Medium"
+              },
+              {
+                "name": "Low"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Assignee",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Requester",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Labels",
+          "type": "singleLineText",
+          "description": "Semicolon-separated, e.g. homepage; copy"
+        },
+        {
+          "name": "Details",
+          "type": "multilineText"
+        },
+        {
+          "name": "Links",
+          "type": "multilineText"
+        },
+        {
+          "name": "Rank",
+          "type": "number",
+          "options": {
+            "precision": 3
+          }
+        },
+        {
+          "name": "Related",
+          "type": "singleLineText",
+          "description": "Keys of related tickets, semicolon-separated. A link stored on one ticket shows on both."
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "description": "One row per comment, added by the board.",
+      "fields": [
+        {
+          "name": "Comment ID",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Ticket Key",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Author",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Created At (UTC)",
+          "type": "singleLineText",
+          "description": "ISO 8601 timestamp, as written by the board."
+        },
+        {
+          "name": "Body",
+          "type": "multilineText"
+        }
+      ]
+    },
+    {
+      "name": "Epics",
+      "description": "One row per swim lane.",
+      "fields": [
+        {
+          "name": "Epic Key",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Epic",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Description",
+          "type": "multilineText"
+        },
+        {
+          "name": "Color",
+          "type": "singleLineText",
+          "description": "Hex colour for the lane marker, e.g. #2563EB"
+        },
+        {
+          "name": "Lane Order",
+          "type": "number",
+          "options": {
+            "precision": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Statuses",
+      "description": "One row per board column.",
+      "fields": [
+        {
+          "name": "Status",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Order",
+          "type": "number",
+          "options": {
+            "precision": 0
+          }
+        },
+        {
+          "name": "Category",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "To Do"
+              },
+              {
+                "name": "In Progress"
+              },
+              {
+                "name": "Done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Show As Column",
+          "type": "checkbox",
+          "options": {
+            "icon": "check",
+            "color": "greenBright"
+          }
+        },
+        {
+          "name": "WIP Limit",
+          "type": "number",
+          "options": {
+            "precision": 0
+          }
+        }
+      ]
+    }
+  ]
+}

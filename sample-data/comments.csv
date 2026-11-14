@@ -1,0 +1,4 @@
+Comment ID,Ticket Key,Author,Created At (UTC),Body
+C-sample-1,WEB-2,Sam,2026-01-12T14:02:00.000Z,The hero image feels heavy on a phone. Can we try the lighter crop?
+C-sample-2,WEB-2,Alex,2026-01-12T16:40:00.000Z,Lighter crop is in the latest mock. Link is on the ticket.
+C-sample-3,WEB-10,Jo,2026-01-13T09:15:00.000Z,Reproduced. The form still points at the old support address.

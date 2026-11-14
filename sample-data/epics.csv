@@ -1,0 +1,5 @@
+Epic Key,Epic,Description,Color,Lane Order
+DESIGN,Design,"Page designs, visual identity, and the decisions behind them.",#7C3AED,1
+CONTENT,Content,"Copy, images, and customer proof for every page.",#D97706,2
+BUILD,Build,"Templates, forms, hosting, and bug fixes.",#2563EB,3
+LAUNCH,Launch,Everything that has to happen in the last week and on the day.,#059669,4

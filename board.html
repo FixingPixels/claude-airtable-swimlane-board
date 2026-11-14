@@ -1,0 +1,769 @@
+<title>Swimlane Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: status columns across, swim lanes down, ticket detail docked right. One committed dark look (scificn, cassette-futurism). */
+:root{
+  color-scheme:dark;
+  --bg:#050505; --sf:#0D0D0D; --sr:#141414; --bd:#252525;
+  --acc:#00ed3f; --bone:#E0D5BE; --mut:#8F8A78; --amb:#ff8800; --red:#ff5533; --blu:#7f9cf0;
+  --mono:'IBM Plex Mono','Space Mono',ui-monospace,'Courier New',monospace;
+  --glow:0 0 8px #00ed3f66,0 0 20px #00ed3f33;
+  --tglow:0 0 6px #00ed3f99,0 0 14px #00ed3f55;
+  --n6:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);
+  --n10:polygon(10px 0%,100% 0%,100% calc(100% - 10px),calc(100% - 10px) 100%,0% 100%,0% 10px);
+  --n16:polygon(16px 0%,100% 0%,100% calc(100% - 16px),calc(100% - 16px) 100%,0% 100%,0% 16px);
+}
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+html{background:var(--bg)}
+body{
+  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 3px,rgba(255,255,255,.018) 4px),var(--bg);
+  color:var(--bone);font-family:var(--mono);font-size:14px;line-height:1.6;
+  padding-block:20px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  min-height:100%;
+}
+::selection{background:var(--acc);color:var(--bg)}
+a{color:var(--acc);text-decoration:none;overflow-wrap:anywhere}
+a:hover{text-shadow:var(--tglow)}
+button,input,select,textarea{font-family:inherit;color:inherit}
+:focus-visible{outline:1px solid var(--acc);outline-offset:2px;box-shadow:var(--glow)}
+.app{display:flex;flex-direction:column;gap:16px;max-width:1800px;margin:0 auto}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
+.brand{display:flex;flex-direction:column;gap:2px;flex:1 1 280px;min-width:0}
+h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);text-shadow:var(--tglow);text-wrap:balance}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--bd);color:var(--mut);white-space:nowrap}
+.badge.ok{border-color:var(--acc);color:var(--acc);box-shadow:inset 0 0 8px #00ed3f11}
+.badge.warn{border-color:var(--amb);color:var(--amb)}
+.badge.err{border-color:var(--red);color:var(--red)}
+.badge.scan .dot{animation:blink 1s step-end infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.badge.scan .dot{animation:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;background:var(--sf);border:1px solid var(--bd);color:var(--bone);cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn:hover{border-color:var(--acc);color:var(--acc);box-shadow:var(--glow)}
+.btn.exec{background:transparent;border-color:var(--acc);color:var(--acc)}
+.btn.exec:hover,.btn.exec.on{background:var(--acc);color:var(--bg);box-shadow:var(--glow)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{border-color:var(--bd);box-shadow:none}
+.btn.sm{height:28px;padding:0 12px}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+.tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld.grow{flex:1 1 220px}
+.in{width:100%;height:36px;padding:0 12px;font-size:12px;background:var(--sf);border:1px solid var(--bd);color:var(--bone);outline:none;caret-color:var(--acc);transition:all .15s}
+textarea.in{height:auto;padding:8px 12px;line-height:1.5;resize:vertical}
+select.in{padding-right:8px;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+.in:focus{border-color:var(--acc);box-shadow:var(--glow)}
+.in::placeholder{color:var(--mut)}
+.in:disabled{opacity:.6}
+
+.notice{padding:12px 16px;background:var(--sf);border:1px solid var(--amb);color:var(--bone);clip-path:var(--n10);font-size:13px}
+.notice.err{border-color:var(--red)}
+.notice b{color:var(--amb);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:11px;display:block;margin-bottom:2px}
+
+.work{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px}
+main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column}
+.colhead{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));border-bottom:1px solid var(--bd)}
+.colbtn{display:flex;align-items:baseline;gap:8px;padding:8px 12px;margin-bottom:-1px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--bone);background:none;border:0;border-bottom:2px solid transparent;text-align:left;cursor:default;min-width:0}
+.colbtn .n{color:var(--mut);font-variant-numeric:tabular-nums}
+.colbtn .wip{margin-left:auto;color:var(--mut);white-space:nowrap}
+.colbtn.over{color:var(--amb);border-bottom-color:var(--amb)}
+.colbtn.over .wip{color:var(--amb)}
+
+.lane{margin-top:14px;background:var(--sf);border:1px solid var(--bd);clip-path:var(--n16)}
+.lanehead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:9px 14px 9px 22px;background:var(--sr);border-bottom:1px solid var(--bd)}
+.lane.shut .lanehead{border-bottom:0}
+.tog{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:12px;background:transparent;border:1px solid transparent;color:var(--acc);cursor:pointer}
+.tog:hover{border-color:var(--bd)}
+.sw{width:10px;height:10px;flex:none;border:1px solid var(--bd)}
+.lanehead h2{margin:0;font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);min-width:0;overflow-wrap:anywhere}
+.stc{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.stc span{white-space:nowrap}
+.stc b{color:var(--bone);font-weight:600;font-variant-numeric:tabular-nums}
+.stc .zero b{color:var(--mut);font-weight:400}
+.btn.abort{background:transparent;border-color:var(--red);color:var(--red)}
+.btn.abort:hover{background:var(--red);color:var(--bg);box-shadow:0 0 8px #cc220066,0 0 20px #cc220033}
+.bar{margin-left:auto;font-size:12px;white-space:pre;color:var(--mut)}
+.bar i{font-style:normal;color:var(--acc);text-shadow:var(--tglow)}
+.bar em{font-style:normal;font-size:11px;color:var(--bone)}
+.cells{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
+.cell{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:72px;padding:12px;border-left:1px solid var(--bd)}
+.cell:first-child{border-left:0}
+.cell.hot{background:#00ed3f0d;box-shadow:inset 0 0 0 1px var(--acc)}
+.add{display:inline-flex;align-items:center;justify-content:center;height:32px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;background:transparent;border:1px dashed var(--bd);color:var(--mut);cursor:pointer;opacity:0;transition:opacity .15s}
+.cell:hover .add,.add:focus-visible{opacity:1}
+.add:hover{border-color:var(--acc);color:var(--acc)}
+@media (hover:none){.add{opacity:1}}
+
+.card{background:var(--bg);border:1px solid var(--bd);clip-path:var(--n6);padding:12px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;transition:border-color .15s}
+.card:hover{border-color:var(--mut)}
+.card.sel{border-color:var(--acc);box-shadow:inset 0 0 14px #00ed3f29}
+.card.sel .key{text-shadow:var(--tglow)}
+.card.done{opacity:.72}
+.card.done .key{color:var(--bone);text-decoration:line-through}
+.card.drag{opacity:.35}
+.card.before{box-shadow:inset 0 3px 0 var(--acc)}
+.row{display:flex;align-items:center;gap:10px;min-width:0}
+.row.sp{justify-content:space-between}
+.key{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--acc);white-space:nowrap}
+.typ{display:inline-flex;align-items:center;gap:6px;padding:1px 7px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;border:1px solid var(--bd);color:var(--mut);white-space:nowrap}
+.typ.bug{border-color:var(--red);color:var(--red)}
+.typ.feature{border-color:var(--blu);color:var(--blu)}
+.typ.decision{border-color:var(--amb);color:var(--amb)}
+.sum{font-size:13px;line-height:1.45;color:var(--bone);overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:0 6px;font-size:11px;letter-spacing:.06em;border:1px solid var(--bd);color:var(--mut)}
+.meta{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.p-highest{color:var(--red)}.p-high{color:var(--amb)}.p-medium{color:var(--bone)}.p-low,.p-none,.cc{color:var(--mut)}
+.who{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 3px;border:1px solid var(--bd);color:var(--bone)}
+.who.none{border-style:dashed;color:var(--mut)}
+.empty{padding:28px 16px;text-align:center;color:var(--mut);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+
+aside{flex:1 1 320px;min-width:0;max-width:100%;background:var(--sf);border:1px solid var(--bd);clip-path:var(--n10);position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
+.dhead{display:flex;align-items:center;gap:8px;padding:9px 14px 9px 18px;background:var(--sr);border-bottom:1px solid var(--bd)}
+.dbody{display:flex;flex-direction:column;gap:14px;padding:14px;max-height:calc(100vh - 90px);overflow-y:auto}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kv{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 12px;font-size:12px}
+.kv span:nth-child(even){overflow-wrap:anywhere}
+.rule{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.cmt{display:flex;flex-direction:column;gap:4px;padding:10px;background:var(--bg);border:1px solid var(--bd)}
+.cmt .h{display:flex;justify-content:space-between;gap:8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.cmt .h b{color:var(--acc);font-weight:500}
+.cmt .h span{color:var(--mut);white-space:nowrap}
+.cmt .b{font-size:12.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.relchip{display:flex;align-items:center;gap:8px;padding:2px 2px 2px 10px;background:var(--bg);border:1px solid var(--bd);min-width:0}
+.relchip.done{opacity:.72}
+.rk{background:none;border:0;padding:0;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--acc);cursor:pointer;white-space:nowrap}
+.rk:hover{text-shadow:var(--tglow)}
+.rs{flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.relchip .lbl{white-space:nowrap}
+/* Expanded ticket detail: a wide overlay with the fields on the left and links and comments on the right. */
+#scrim{display:none}
+body.dx #scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:39}
+body.dx aside{position:fixed;z-index:40;top:calc(24px + env(safe-area-inset-top,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:min(1120px,calc(100vw - 32px));max-width:none;display:flex;flex-direction:column;clip-path:var(--n16)}
+body.dx .dbody{max-height:none;flex:1;min-height:0;overflow-y:auto;padding:18px 20px}
+body.dx #dDetails{min-height:240px}
+body.dx #dSummary{min-height:64px}
+body.dx #cBody{min-height:140px}
+body.dx .rs{white-space:normal}
+@media (min-width:900px){
+  body.dx .dbody{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto 1fr;gap:14px 28px;align-items:start}
+  body.dx #dform{grid-row:1 / span 2}
+}
+
+#toasts{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:50;max-width:min(420px,calc(100vw - 32px))}
+.toast{padding:10px 14px;background:var(--sr);border:1px solid var(--acc);color:var(--bone);font-size:12px;clip-path:var(--n6);box-shadow:var(--glow)}
+.toast.err{border-color:var(--red);box-shadow:none}
+.toast.warn{border-color:var(--amb);box-shadow:none}
+
+body.ro .add,body.ro .edit-only{display:none}
+.phone-only{display:none}
+@media (max-width:760px){
+  .colhead{display:flex;overflow-x:auto}
+  .colbtn{cursor:pointer;white-space:nowrap;flex:none;min-width:auto}
+  .colbtn.pick{color:var(--acc);border-bottom-color:var(--acc);text-shadow:var(--tglow)}
+  .colbtn .wip{margin-left:0}
+  .cells{grid-template-columns:minmax(0,1fr)}
+  .cell{border-left:0;display:none}
+  .cell.pick{display:flex}
+  .bar{margin-left:0}
+  aside{position:static}
+  .dbody{max-height:none}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="lbl" id="proj">— Project ———</div>
+      <h1>Board // Epics &amp; Tickets</h1>
+    </div>
+    <span id="conn" class="badge scan"><span class="dot">●</span> <span id="connTxt">Linking to base</span></span>
+    <span id="age" class="lbl"></span>
+    <button id="newTicket" type="button" class="btn exec edit-only">+ New ticket</button>
+    <button id="refresh" type="button" class="btn">Refresh</button>
+  </header>
+
+  <div class="tools">
+    <div class="fld grow"><label class="lbl" for="q">Search</label><input id="q" class="in" type="text" placeholder="> key or summary" autocomplete="off"></div>
+    <div class="fld"><span class="lbl">Filter</span><button id="mine" type="button" class="btn exec" aria-pressed="false">▶ Mine</button></div>
+    <div class="fld"><label class="lbl" for="fAssignee">Assignee</label><select id="fAssignee" class="in"></select></div>
+    <div class="fld"><label class="lbl" for="fType">Type</label><select id="fType" class="in"></select></div>
+    <div class="fld"><label class="lbl" for="fLabel">Label</label><select id="fLabel" class="in"></select></div>
+    <div class="fld"><label class="lbl" for="fRequester">Requester</label><select id="fRequester" class="in"></select></div>
+    <div class="fld"><label class="lbl" for="groupBy">Group by</label><select id="groupBy" class="in"><option value="epic">Epic</option><option value="assignee">Assignee</option><option value="none">None</option></select></div>
+    <div class="fld"><label class="lbl" for="iam">I am</label><select id="iam" class="in"></select></div>
+    <div class="fld"><span class="lbl">Column</span><button id="wont" type="button" class="btn" aria-pressed="false">Won't do: hidden</button></div>
+  </div>
+
+  <div id="notice" hidden></div>
+
+  <div class="work">
+    <main>
+      <div id="colhead" class="colhead" style="--cols:4"></div>
+      <div id="lanes"><div class="empty">Tickets appear here once the base has been read.<br>Each epic gets a lane; each status gets a column.</div></div>
+    </main>
+    <aside id="detail" aria-label="Ticket detail" hidden></aside>
+  </div>
+</div>
+<div id="scrim"></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+/* ── Configuration ──────────────────────────────────────────────
+   BASE_ID is the only value that must be set. Claude fills it in during setup (see CLAUDE.md).
+   Tables and fields are found by NAME each time the board loads, so no other IDs live in this file. */
+const CONFIG={
+  BASE_ID:'',               // Airtable base ID. Starts with "app" and is 17 characters long.
+  SERVER:'Airtable',        // The Airtable connector's name as it appears in Claude.
+  PROJECT:'Sample Project', // Shown above the board title.
+  KEY_PREFIX:'TKT',         // Prefix for the first ticket key when the base has no tickets yet.
+  POLL_SECONDS:120          // How often the board re-reads tickets and comments. 0 turns polling off.
+};
+const BASE_ID=CONFIG.BASE_ID,SERVER=CONFIG.SERVER;
+const BASE_OK=/^app[A-Za-z0-9]{14}$/.test(BASE_ID);
+const TABLE_NAMES={tickets:'Tickets',comments:'Comments',epics:'Epics',statuses:'Statuses'};
+const TABLES={},F={tickets:{},comments:{},epics:{},statuses:{}};
+const POLL_MS=Math.max(0,Number(CONFIG.POLL_SECONDS)||0)*1000;
+const TYPES=['Task','Bug','Feature','Chore','Decision'];
+const PRIOS=['Highest','High','Medium','Low'];
+const DEFAULT_STATUSES=[['To Do','1','To Do','TRUE',''],['In Progress','2','In Progress','TRUE',''],['In Review','3','In Progress','TRUE',''],['Done','4','Done','TRUE',''],["Won't Do",'5','Done','FALSE','']];
+const DENIED=['needs_reauth','server_not_connected','selection_required','server_not_found','blocked_by_policy','approval_required','not_in_manifest','consent_required','not_granted'];
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const low=s=>String(s||'').trim().toLowerCase();
+const store={get(k,d){try{const v=localStorage.getItem('slb.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('slb.'+k,JSON.stringify(v))}catch(e){}}};
+
+const S={raw:{},tickets:[],comments:[],epics:[],statuses:[],
+  filters:{q:'',mine:false,assignee:'',type:'',label:'',requester:''},
+  groupBy:store.get('groupBy','epic'),showWont:store.get('showWont',false),collapsed:store.get('collapsed',{}),
+  me:store.get('me',''),meChosen:!!store.get('me',''),profileName:'',
+  cdrafts:store.get('cdrafts',{})||{},expanded:!!store.get('expanded',false),
+  sel:null,draftNew:null,dirty:false,busy:false,readonly:false,phoneStatus:null,
+  conn:'linking',storedAt:null,watching:false,dragKey:null};
+let mcp=null;
+
+/* ── Airtable records → objects keyed by field name ── */
+function cell(v){if(v==null)return'';if(typeof v==='boolean')return v?'TRUE':'FALSE';if(typeof v==='object')return String(v.name==null?'':v.name).trim();return String(v).trim()}
+function objs(name,records){
+  if(!Array.isArray(records))return[];
+  const map=F[name];
+  return records.filter(r=>r&&typeof r==='object').map((r,i)=>{const o={_id:r.id,_row:i+2},c=r.cellValuesByFieldId||{};Object.keys(map).forEach(h=>{o[h]=cell(c[map[h]])});return o});
+}
+const truthy=v=>low(v)==='true'||v===true;
+function rebuild(){
+  S.tickets=objs('tickets',S.raw.tickets).filter(t=>t.Key).map(t=>{t._rank=parseFloat(t.Rank);if(isNaN(t._rank))t._rank=1e9+t._row;return t});
+  S.comments=objs('comments',S.raw.comments).filter(c=>c['Ticket Key']&&c.Body);
+  S.epics=objs('epics',S.raw.epics).filter(e=>e['Epic Key']).sort((a,b)=>(parseFloat(a['Lane Order'])||0)-(parseFloat(b['Lane Order'])||0));
+  let st=objs('statuses',S.raw.statuses).filter(s=>s.Status);
+  if(!st.length)st=DEFAULT_STATUSES.map(r=>({Status:r[0],Order:r[1],Category:r[2],'Show As Column':r[3],'WIP Limit':r[4]}));
+  S.statuses=st.sort((a,b)=>(parseFloat(a.Order)||0)-(parseFloat(b.Order)||0));
+  if(!S.meChosen)S.me=guessMe();
+  /* Related links are stored on one ticket and shown on both. */
+  const have=new Set(S.tickets.map(t=>t.Key)),rel={};
+  const link=(a,b)=>{if(a===b||!have.has(a)||!have.has(b))return;rel[a]=rel[a]||[];if(!rel[a].includes(b))rel[a].push(b)};
+  S.tickets.forEach(t=>relKeys(t.Related).forEach(k=>{link(t.Key,k);link(k,t.Key)}));
+  S.rel=rel;
+}
+const relKeys=s=>String(s||'').split(/[;,\s]+/).map(x=>x.trim().toUpperCase()).filter(Boolean);
+const keyNum=k=>{const m=/(\d+)$/.exec(k);return m?+m[1]:0};
+function people(){
+  const set=new Map();
+  const add=n=>{n=String(n||'').trim();if(n&&!set.has(low(n)))set.set(low(n),n)};
+  S.tickets.forEach(t=>{add(t.Assignee);add(t.Requester)});S.comments.forEach(c=>add(c.Author));
+  return[...set.values()].sort((a,b)=>a.localeCompare(b));
+}
+function guessMe(){
+  const pn=S.profileName.trim();if(!pn)return'';
+  const first=pn.split(/\s+/)[0];
+  return people().find(p=>low(p)===low(pn))||people().find(p=>low(p)===low(first))||first;
+}
+const labelsOf=t=>t.Labels?t.Labels.split(/[;,]/).map(s=>s.trim()).filter(Boolean):[];
+const visibleStatuses=()=>S.statuses.filter(s=>truthy(s['Show As Column'])||(S.showWont&&low(s.Category)==='done'&&!truthy(s['Show As Column'])));
+const isDone=name=>{const s=S.statuses.find(x=>x.Status===name);return!!s&&low(s.Category)==='done'};
+function statusOf(t){const v=visibleStatuses();if(S.statuses.some(s=>s.Status===t.Status))return t.Status;return v.length?v[0].Status:t.Status}
+
+/* ── Filters and groups ── */
+function passes(t){
+  const f=S.filters;
+  if(f.q){const q=low(f.q);if(!low(t.Key).includes(q)&&!low(t.Summary).includes(q))return false}
+  if(f.mine&&(!S.me||low(t.Assignee)!==low(S.me)))return false;
+  if(f.assignee&&(f.assignee==='—'?t.Assignee!=='':t.Assignee!==f.assignee))return false;
+  if(f.type&&t.Type!==f.type)return false;
+  if(f.label&&!labelsOf(t).includes(f.label))return false;
+  if(f.requester&&t.Requester!==f.requester)return false;
+  return true;
+}
+function groups(){
+  if(S.groupBy==='epic'){
+    const g=S.epics.map(e=>({id:e['Epic Key'],title:e.Epic||e['Epic Key'],tag:'Epic // '+e['Epic Key'],color:/^#[0-9a-f]{6}$/i.test(e.Color)?e.Color:''}));
+    const known=new Set(g.map(x=>x.id));
+    if(S.tickets.some(t=>!known.has(t['Epic Key'])))g.push({id:'~none',title:'No epic',tag:'Epic // —',color:''});
+    return g;
+  }
+  if(S.groupBy==='assignee'){
+    const names=[...new Set(S.tickets.map(t=>t.Assignee).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const g=names.map(n=>({id:n,title:n,tag:'Assignee',color:''}));
+    if(S.tickets.some(t=>!t.Assignee))g.push({id:'~none',title:'Unassigned',tag:'Assignee',color:''});
+    return g;
+  }
+  return[{id:'~all',title:'All tickets',tag:'Board',color:''}];
+}
+function groupOf(t){
+  if(S.groupBy==='epic'){return S.epics.some(e=>e['Epic Key']===t['Epic Key'])?t['Epic Key']:'~none'}
+  if(S.groupBy==='assignee')return t.Assignee||'~none';
+  return'~all';
+}
+const cmtCount=()=>{const m={};S.comments.forEach(c=>{m[c['Ticket Key']]=(m[c['Ticket Key']]||0)+1});return m};
+
+/* ── Rendering ── */
+function initials(n){const p=String(n).trim().split(/\s+/);return(p.length>1?p[0][0]+p[p.length-1][0]:p[0].slice(0,2)).toUpperCase()}
+function prioHtml(p){
+  const k=low(p);
+  if(k==='highest')return'<span class="p-highest">▲ Highest</span>';
+  if(k==='high')return'<span class="p-high">▲ High</span>';
+  if(k==='medium')return'<span class="p-medium">■ Medium</span>';
+  if(k==='low')return'<span class="p-low">▼ Low</span>';
+  return'<span class="p-none">— Priority</span>';
+}
+function typeHtml(t){const k=low(t);const sym=k==='bug'?'✕':k==='feature'?'●':k==='decision'?'◆':'○';return'<span class="typ '+esc(k)+'">'+sym+' '+esc(t||'Task')+'</span>'}
+function cardHtml(t,cc){
+  const labs=labelsOf(t);
+  return'<div class="card'+(S.sel===t.Key?' sel':'')+(isDone(t.Status)?' done':'')+'" role="button" tabindex="0" data-key="'+esc(t.Key)+'"'+(S.readonly?'':' draggable="true"')+' aria-label="'+esc(t.Key+': '+t.Summary)+'">'
+    +'<div class="row sp"><span class="key">'+esc(t.Key)+'</span>'+typeHtml(t.Type)+'</div>'
+    +'<div class="sum">'+esc(t.Summary)+'</div>'
+    +(labs.length?'<div class="chips">'+labs.map(l=>'<span class="chip">'+esc(l)+'</span>').join('')+'</div>':'')
+    +'<div class="row meta">'+prioHtml(t.Priority)+(cc[t.Key]?'<span class="cc" title="Comments">◈ '+cc[t.Key]+'</span>':'')+((S.rel[t.Key]||[]).length?'<span class="cc" title="Related tickets">⇄ '+S.rel[t.Key].length+'</span>':'')
+    +(t.Assignee?'<span class="who" title="'+esc(t.Assignee)+'">'+esc(initials(t.Assignee))+'</span>':'<span class="who none" title="Unassigned">··</span>')+'</div></div>';
+}
+function barHtml(done,total){
+  const pct=total?Math.round(done/total*100):0,n=Math.round(pct/100*20);
+  return'<span class="bar" role="img" aria-label="'+done+' of '+total+' done">[<i>'+'='.repeat(n)+' '.repeat(20-n)+'</i>] <em>'+pct+'%</em></span>';
+}
+function renderBoard(){
+  const cols=visibleStatuses(),cc=cmtCount();
+  if(!S.phoneStatus||!cols.some(c=>c.Status===S.phoneStatus))S.phoneStatus=cols.length?cols[0].Status:null;
+  const shown=S.tickets.filter(passes);
+  $('colhead').style.setProperty('--cols',cols.length||1);
+  $('colhead').innerHTML=cols.map(c=>{
+    const n=shown.filter(t=>statusOf(t)===c.Status).length,lim=parseInt(c['WIP Limit'],10);
+    const over=lim>0&&n>lim;
+    return'<button type="button" class="colbtn'+(over?' over':'')+(S.phoneStatus===c.Status?' pick':'')+'" data-col="'+esc(c.Status)+'">'+esc(c.Status)+' <span class="n">'+String(n).padStart(2,'0')+'</span>'+(lim>0?'<span class="wip">WIP '+n+'/'+lim+'</span>':'')+'</button>';
+  }).join('');
+  if(!S.tickets.length&&!(S.epics.length&&S.groupBy==='epic')){
+    $('lanes').innerHTML='<div class="empty">'+(S.conn==='linking'?'Reading the base…':'No tickets yet.<br>Press + New ticket to add the first one.')+'</div>';
+    return;
+  }
+  const html=groups().map(g=>{
+    const all=S.tickets.filter(t=>groupOf(t)===g.id),mine=shown.filter(t=>groupOf(t)===g.id);
+    if(!all.length&&S.groupBy!=='epic')return'';
+    const shut=!!S.collapsed[S.groupBy+':'+g.id];
+    const done=all.filter(t=>isDone(t.Status)).length;
+    const cells=shut?'':'<div class="cells" style="--cols:'+(cols.length||1)+'">'+cols.map(c=>{
+      const list=mine.filter(t=>statusOf(t)===c.Status).sort((a,b)=>a._rank-b._rank);
+      return'<div class="cell'+(S.phoneStatus===c.Status?' pick':'')+'" data-status="'+esc(c.Status)+'" data-group="'+esc(g.id)+'">'+list.map(t=>cardHtml(t,cc)).join('')
+        +'<button type="button" class="add" data-add="1">+ New ticket</button></div>';
+    }).join('')+'</div>';
+    return'<section class="lane'+(shut?' shut':'')+'"><div class="lanehead">'
+      +'<button type="button" class="tog" data-tog="'+esc(g.id)+'" aria-expanded="'+(!shut)+'" aria-label="'+(shut?'Expand':'Collapse')+' lane '+esc(g.title)+'">'+(shut?'▶':'▼')+'</button>'
+      +(g.color?'<span class="sw" style="background:'+g.color+'"></span>':'')
+      +'<span class="lbl" style="font-weight:600">'+esc(g.tag)+'</span><h2>'+esc(g.title)+'</h2>'
+      +'<span class="lbl">'+(mine.length===all.length?all.length:mine.length+' of '+all.length)+' ticket'+(all.length===1?'':'s')+'</span>'
+      +'<span class="stc">'+cols.map(c=>{const n=mine.filter(t=>statusOf(t)===c.Status).length;return'<span'+(n?'':' class="zero"')+'>'+esc(c.Status)+' <b>'+n+'</b></span>'}).join('')+'</span>'
+      +barHtml(done,all.length)+'</div>'+cells+'</section>';
+  }).join('');
+  $('lanes').innerHTML=html||'<div class="empty">No tickets match these filters.</div>';
+}
+function setOptions(id,items,first,value){
+  const el=$(id),sig=first+'|'+items.join('|');
+  if(el.dataset.sig!==sig){
+    el.innerHTML='<option value="">'+esc(first)+'</option>'+items.map(i=>'<option value="'+esc(i)+'">'+esc(i==='—'?'Unassigned':i)+'</option>').join('');
+    el.dataset.sig=sig;
+  }
+  el.value=items.includes(value)?value:'';
+}
+function renderTools(){
+  const f=S.filters,uniq=a=>[...new Set(a.filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  setOptions('fAssignee',uniq(S.tickets.map(t=>t.Assignee)).concat(S.tickets.some(t=>!t.Assignee)?['—']:[]),'All',f.assignee);
+  setOptions('fType',uniq(S.tickets.map(t=>t.Type)),'All',f.type);
+  setOptions('fLabel',uniq([].concat(...S.tickets.map(labelsOf))),'All',f.label);
+  setOptions('fRequester',uniq(S.tickets.map(t=>t.Requester)),'All',f.requester);
+  const ppl=people();if(S.me&&!ppl.some(p=>low(p)===low(S.me)))ppl.push(S.me);
+  setOptions('iam',ppl,'Choose…',ppl.find(p=>low(p)===low(S.me))||'');
+  $('groupBy').value=S.groupBy;
+  $('mine').classList.toggle('on',f.mine);$('mine').setAttribute('aria-pressed',f.mine);
+  $('wont').textContent="Won't do: "+(S.showWont?'shown':'hidden');$('wont').setAttribute('aria-pressed',S.showWont);
+  document.body.classList.toggle('ro',S.readonly);
+}
+function fmtWhen(s){const d=new Date(s);if(isNaN(d))return s;return d.toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function linkify(s){return esc(s).replace(/https?:\/\/[^\s<]+/g,u=>'<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+u+'</a>')}
+function opt(list,val,blank){return(blank!=null?'<option value="">'+esc(blank)+'</option>':'')+list.map(v=>'<option value="'+esc(v)+'"'+(v===val?' selected':'')+'>'+esc(v)+'</option>').join('')}
+function renderDetail(){
+  const el=$('detail'),isNew=S.sel==='~new';
+  const t=isNew?S.draftNew:S.tickets.find(x=>x.Key===S.sel);
+  document.body.classList.toggle('dx',!!t&&S.expanded);
+  if(!t){el.hidden=true;el.innerHTML='';S.sel=null;return}
+  el.hidden=false;
+  const dis=S.readonly?' disabled':'';
+  const epicKeys=S.epics.map(e=>e['Epic Key']);
+  el.innerHTML='<div class="dhead"><span class="lbl" style="font-weight:600">'+(isNew?'New ticket':'Detail //')+'</span>'+(isNew?'':'<span class="key">'+esc(t.Key)+'</span>')
+    +'<button type="button" class="btn sm" data-expand="1" style="margin-left:auto">'+(S.expanded?'Collapse':'Expand')+'</button>'
+    +'<button type="button" class="tog" data-close="1" aria-label="Close detail" style="color:var(--bone)">✕</button></div>'
+    +'<div class="dbody"><form id="dform" class="fld" style="gap:10px" autocomplete="off">'
+    +'<div class="fld"><label class="lbl" for="dSummary">Summary</label><textarea id="dSummary" class="in" rows="2" required'+dis+'>'+esc(t.Summary)+'</textarea></div>'
+    +'<div class="grid2">'
+    +'<div class="fld"><label class="lbl" for="dStatus">Status</label><select id="dStatus" class="in"'+dis+'>'+opt(S.statuses.map(s=>s.Status),t.Status)+'</select></div>'
+    +'<div class="fld"><label class="lbl" for="dEpic">Epic</label><select id="dEpic" class="in"'+dis+'>'+'<option value="">— none —</option>'+S.epics.map(e=>'<option value="'+esc(e['Epic Key'])+'"'+(e['Epic Key']===t['Epic Key']?' selected':'')+'>'+esc(e.Epic)+'</option>').join('')+(t['Epic Key']&&!epicKeys.includes(t['Epic Key'])?'<option selected value="'+esc(t['Epic Key'])+'">'+esc(t['Epic Key'])+'</option>':'')+'</select></div>'
+    +'<div class="fld"><label class="lbl" for="dType">Type</label><select id="dType" class="in"'+dis+'>'+opt(TYPES.includes(t.Type)||!t.Type?TYPES:TYPES.concat([t.Type]),t.Type||'Task')+'</select></div>'
+    +'<div class="fld"><label class="lbl" for="dPriority">Priority</label><select id="dPriority" class="in"'+dis+'>'+opt(PRIOS.includes(t.Priority)||!t.Priority?PRIOS:PRIOS.concat([t.Priority]),t.Priority,'— none —')+'</select></div>'
+    +'<div class="fld"><label class="lbl" for="dAssignee">Assignee</label><input id="dAssignee" class="in" list="pplList" value="'+esc(t.Assignee)+'"'+dis+'><datalist id="pplList">'+people().map(p=>'<option value="'+esc(p)+'">').join('')+'</datalist></div>'
+    +'<div class="fld"><label class="lbl" for="dLabels">Labels</label><input id="dLabels" class="in" placeholder="a; b" value="'+esc(t.Labels)+'"'+dis+'></div>'
+    +'</div>'
+    +'<div class="fld"><label class="lbl" for="dDetails">Details</label><textarea id="dDetails" class="in" rows="4"'+dis+'>'+esc(t.Details)+'</textarea></div>'
+    +(isNew?'':'<div class="kv">'
+      +(t.Requester?'<span class="lbl">Requester</span><span>'+esc(t.Requester)+'</span>':'')
+      +(t.Links?'<span class="lbl">Links</span><span>'+linkify(t.Links)+'</span>':'')+'</div>')
+    +'<div class="acts edit-only">'+(isNew?'':'<button type="button" class="btn abort" data-del="1" style="margin-right:auto">Delete ticket</button>')+'<button type="submit" class="btn exec" id="dSave">'+(isNew?'Create ticket':'Save changes')+'</button></div>'
+    +(isNew?'':'<div id="delBox" class="notice err edit-only" hidden style="clip-path:none"><b>Delete '+esc(t.Key)+'?</b>This removes the ticket and its comments from Airtable.<div class="acts" style="margin-top:10px"><button type="button" class="btn" data-delno="1">Keep ticket</button><button type="button" class="btn abort" data-delyes="1">Delete</button></div></div>')
+    +'</form>'
+    +(isNew?'':'<div id="rels" class="fld" style="gap:8px"></div><div id="cmts" class="fld" style="gap:10px"></div>')
+    +'</div>';
+  S.dirty=false;
+  if(!isNew){renderRelated();renderComments()}
+}
+function renderComments(){
+  const box=$('cmts');if(!box||!S.sel)return;
+  /* The comment box is built once per ticket and then left alone: refreshes only redraw the list above it, so typing is never interrupted. The draft is also kept per ticket in this browser until it is posted. */
+  if(box.dataset.key!==S.sel||!$('cBody')){
+    box.innerHTML='<div id="clist" class="fld" style="gap:10px"></div>'
+      +'<form id="cform" class="fld edit-only" style="gap:8px"><label class="lbl" for="cBody" id="cLabel"></label>'
+      +'<textarea id="cBody" class="in" rows="4" placeholder="> _" required></textarea>'
+      +'<div class="acts"><button type="submit" class="btn exec">Post</button></div></form>';
+    box.dataset.key=S.sel;
+    $('cBody').value=S.cdrafts[S.sel]||'';
+  }
+  const list=S.comments.filter(c=>c['Ticket Key']===S.sel).sort((a,b)=>String(a['Created At (UTC)']).localeCompare(String(b['Created At (UTC)'])));
+  $('clist').innerHTML='<div class="rule">— Comments ('+list.length+') ———</div>'
+    +(list.length?list.map(c=>'<div class="cmt"><div class="h"><b>'+esc(c.Author||'Someone')+'</b><span>'+esc(fmtWhen(c['Created At (UTC)']))+'</span></div><div class="b">'+linkify(c.Body)+'</div></div>').join(''):'<div class="lbl">No comments on this ticket yet.</div>');
+  $('cLabel').textContent='Add comment'+(S.me?' as '+S.me:'');
+}
+function renderRelated(){
+  const box=$('rels');if(!box||!S.sel)return;
+  if(box.dataset.key!==S.sel||!$('relIn')){
+    box.innerHTML='<div class="rule">— Related tickets ———</div><div id="relchips" class="fld" style="gap:6px"></div>'
+      +'<div class="row edit-only"><input id="relIn" class="in" list="relList" aria-label="Link a ticket by key" placeholder="> link a ticket by key" autocomplete="off"><button type="button" class="btn" data-reladd="1">Link</button></div><datalist id="relList"></datalist>';
+    box.dataset.key=S.sel;
+  }
+  const mine=(S.rel[S.sel]||[]).slice().sort((a,b)=>keyNum(a)-keyNum(b));
+  $('relchips').innerHTML=mine.length?mine.map(k=>{
+    const o=S.tickets.find(x=>x.Key===k);
+    return'<div class="relchip'+(isDone(o.Status)?' done':'')+'"><button type="button" class="rk" data-open="'+esc(k)+'">'+esc(k)+'</button><span class="rs" title="'+esc(o.Summary)+'">'+esc(o.Summary)+'</span><span class="lbl">'+esc(o.Status)+'</span>'
+      +'<button type="button" class="tog edit-only" data-relrm="'+esc(k)+'" aria-label="Remove link to '+esc(k)+'" style="color:var(--bone)">✕</button></div>';
+  }).join(''):'<div class="lbl">No related tickets.</div>';
+  $('relList').innerHTML=S.tickets.filter(x=>x.Key!==S.sel&&!mine.includes(x.Key)).map(x=>'<option value="'+esc(x.Key)+'">'+esc(x.Summary)+'</option>').join('');
+}
+function addRelated(){
+  const key=S.sel,t=S.tickets.find(x=>x.Key===key),inp=$('relIn');if(!t||!inp)return;
+  const k=inp.value.trim().toUpperCase();if(!k)return;
+  if(k===key){toast('A ticket cannot be related to itself.','warn');return}
+  if(!S.tickets.some(x=>x.Key===k)){toast('No ticket with the key '+k+'.','warn');return}
+  if((S.rel[key]||[]).includes(k)){toast(k+' is already linked.','warn');inp.value='';return}
+  inp.value='';
+  commit(()=>writeFields(key,{Related:[t.Related,relKeys(t.Related).concat([k]).join('; ')]}),key+' linked to '+k);
+}
+function removeRelated(k){
+  const key=S.sel,t=S.tickets.find(x=>x.Key===key),o=S.tickets.find(x=>x.Key===k);if(!t||!o)return;
+  commit(async()=>{
+    if(relKeys(t.Related).includes(k))await writeFields(key,{Related:[t.Related,relKeys(t.Related).filter(x=>x!==k).join('; ')]});
+    if(relKeys(o.Related).includes(key))await writeFields(k,{Related:[o.Related,relKeys(o.Related).filter(x=>x!==key).join('; ')]});
+  },'Link to '+k+' removed');
+}
+function typing(){const a=document.activeElement;return!!(a&&a.closest&&a.closest('#detail')&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))}
+function renderConn(){
+  const b=$('conn'),map={linking:['scan','Linking to base'],ok:['ok','Base linked'],stale:['warn','Showing last read'],error:['err','Base not linked'],ro:['warn','Read-only view']};
+  const m=map[S.conn]||map.error;
+  b.className='badge '+m[0];$('connTxt').textContent=m[1];
+  if(S.storedAt){const s=Math.max(0,Math.round((Date.now()-S.storedAt)/1000));$('age').textContent='Last read '+(s<60?s+'s':s<3600?Math.floor(s/60)+'m':Math.floor(s/3600)+'h')+' ago'}else $('age').textContent='';
+}
+function notice(html,err){const n=$('notice');if(!html){n.hidden=true;n.innerHTML='';return}n.hidden=false;n.className='notice'+(err?' err':'');n.innerHTML=html}
+function renderAll(keepDetail){renderTools();renderBoard();renderConn();if(!keepDetail&&!typing())renderDetail();else{renderRelated();renderComments()}}
+function toast(msg,kind){const d=document.createElement('div');d.className='toast'+(kind?' '+kind:'');d.textContent=msg;$('toasts').appendChild(d);setTimeout(()=>d.remove(),kind==='err'?9000:4500)}
+
+/* ── Reading the base ── */
+function payloadValues(r){const p=r&&r.payload;return p&&typeof p==='object'&&Array.isArray(p.records)?p.records:[]}
+function apply(name,result){
+  S.raw[name]=payloadValues(result);
+  const at=result&&result.cache&&result.cache.storedAt?result.cache.storedAt:Date.now();
+  S.storedAt=S.storedAt?Math.max(S.storedAt,at):at;
+  rebuild();store.set('snapAt',{raw:S.raw,at:S.storedAt});
+}
+function connMessage(e){
+  const c=e&&e.code,m=e&&e.message?String(e.message).slice(0,240):'';
+  switch(c){
+    case'needs_reauth':return'<b>Airtable needs reconnecting</b>Reconnect Airtable in claude.ai Settings → Connectors, then press Refresh.';
+    case'server_not_connected':case'selection_required':case'server_not_found':return'<b>No Airtable connector here</b>Add Airtable in claude.ai Settings → Connectors (or choose which one to use), then press Refresh.';
+    case'not_in_manifest':case'consent_required':case'not_granted':return'<b>Not allowed in this view</b>This board has not been allowed to use Airtable. Press Refresh to be asked again.';
+    case'approval_required':return'<b>Approval needed</b>Reading the base needs your approval. Press Refresh to approve.';
+    case'blocked_by_policy':return'<b>Blocked by policy</b>Your organization blocks this board from using Airtable.';
+    case'tool_error':return'<b>Airtable refused the request</b>'+esc(m)+' Check that your Airtable account can open the base.';
+    case'capability_disabled':case'capability_removed':return'<b>Connector access unavailable</b>This view cannot reach connectors. Open the board in claude.ai.';
+    case'setup':return'<b>Setup problem</b>'+esc(m)+' See CLAUDE.md in the kit, or ask Claude to check the base.';
+    default:return'<b>Could not reach Airtable</b>'+(S.tickets.length?'Showing the last data read. ':'')+'Press Refresh to try again.';
+  }
+}
+function onReadError(e){
+  if(e&&e.code==='user_changed')return;
+  if(DENIED.includes(e&&e.code)){S.raw={};rebuild();store.set('snapAt',null);S.storedAt=null;S.conn='error'}
+  else S.conn=S.tickets.length?'stale':'error';
+  notice(connMessage(e),S.conn==='error');renderAll(S.dirty);
+}
+const readInput=name=>({baseId:BASE_ID,tableId:TABLES[name],pageSize:1000});
+const read=(name,opts)=>mcp.callTool(SERVER,'list_records_for_table',readInput(name),opts);
+/* Find the four tables and their fields by name, so the board works on any base built to the same shape. */
+async function resolveSchema(){
+  const r=await mcp.callTool(SERVER,'list_tables_for_base',{baseId:BASE_ID},{cache:false});
+  const p=r&&r.payload,tables=p&&typeof p==='object'&&Array.isArray(p.tables)?p.tables:[];
+  const missing=[];
+  Object.keys(TABLE_NAMES).forEach(n=>{
+    const t=tables.find(x=>low(x.name)===low(TABLE_NAMES[n]));
+    if(!t){missing.push(TABLE_NAMES[n]);return}
+    TABLES[n]=t.id;F[n]={};(t.fields||[]).forEach(f=>{F[n][String(f.name).trim()]=f.id});
+  });
+  if(missing.length)throw{code:'setup',message:'The Airtable base has no table named '+missing.join(', ')+'. The board needs Tickets, Comments, Epics, and Statuses.'};
+  const need=['Key','Summary','Status','Epic Key','Epic','Rank'].filter(f=>!F.tickets[f]);
+  if(need.length)throw{code:'setup',message:'The Tickets table is missing the field'+(need.length>1?'s':'')+' '+need.join(', ')+'.'};
+  S.schemaFresh=true;store.set('schema',{TABLES,F});
+}
+/* full = also re-read the schema, epics, and statuses. Ordinary refreshes read only tickets and comments, to keep Airtable calls down. */
+async function loadAll(full){
+  if(!mcp||!BASE_OK)return;
+  try{
+    if(full||!S.schemaFresh)await resolveSchema();
+    apply('tickets',await read('tickets',{cache:{refresh:true}}));
+    const names=['comments'].concat(full||!S.lookups?['epics','statuses']:[]);
+    const rest=await Promise.all(names.map(n=>read(n,{cache:{refresh:true}}).then(r=>[n,r])));
+    rest.forEach(([n,r])=>apply(n,r));
+    S.lookups=true;S.conn='ok';notice('');renderAll(S.dirty);startWatch();
+  }catch(e){onReadError(e)}
+}
+function startWatch(){
+  if(S.watching||!mcp||!POLL_MS)return;S.watching=true;
+  ['tickets','comments'].forEach(name=>{
+    mcp.watchTool(SERVER,'list_records_for_table',readInput(name),ev=>{
+      if(ev.type==='data'){apply(name,ev.result);if(S.conn!=='ok'){S.conn='ok';notice('')}if(!S.busy)renderAll(S.dirty||S.sel==='~new')}
+      else if(DENIED.includes(ev.error&&ev.error.code))onReadError(ev.error);
+      else if(ev.error&&ev.error.code!=='bad_request'){S.conn=S.tickets.length?'stale':'error';renderConn()}
+    },{refetchInterval:Math.max(30000,POLL_MS)});
+  });
+}
+
+/* ── Writing to the base ── */
+function colLetter(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+const safe=v=>{if(typeof v==='number')return v;const s=String(v==null?'':v);return/^[=+\-@]/.test(s)?' '+s:s};
+function writeError(e){
+  const c=e&&e.code;
+  if(c==='conflict')return['That ticket changed in the base ('+e.field+'). Reloaded it; make the edit again.','warn'];
+  if(c==='gone')return['That ticket is no longer in the base. Board reloaded.','warn'];
+  if(c==='schema')return['The base has no "'+e.field+'" column, so the change was not saved.','err'];
+  if(c==='tool_error')return['Airtable refused the change: '+String(e.message||'').slice(0,160)+' Your Airtable account may only have read access.','err'];
+  if(c==='needs_reauth')return['Airtable needs reconnecting in claude.ai Settings → Connectors. Nothing was saved.','err'];
+  if(c==='not_in_manifest'||c==='approval_required'||c==='consent_required'||c==='blocked_by_policy'||c==='not_granted')return['This board is not allowed to write to Airtable in this view. Nothing was saved.','err'];
+  if(c==='server_unavailable'||c==='upstream_error'||c==='cancelled')return['Airtable did not confirm the change. It may or may not have saved; the board has been reloaded to show the base as it is.','warn'];
+  return['The change could not be saved.','err'];
+}
+const SELECTS=['Epic Key','Type','Status','Priority'];
+const toCell=(f,v)=>{if(f==='Rank')return typeof v==='number'?v:parseFloat(v);const s=String(v==null?'':v);return s===''&&SELECTS.includes(f)?null:s};
+async function freshTickets(){return objs('tickets',payloadValues(await read('tickets',{cache:false})))}
+/* changes: {Field:[valueTheViewerSaw|null, newValue]} — null skips the conflict check. One update call per ticket, addressed by record ID. */
+async function writeFields(key,changes){
+  const now=(await freshTickets()).find(t=>t.Key===key);
+  if(!now||!now._id)throw{code:'gone'};
+  const fields={};
+  for(const f of Object.keys(changes)){
+    const fid=F.tickets[f];if(!fid)throw{code:'schema',field:f};
+    const from=changes[f][0];
+    if(from!=null&&now[f]!==String(from).trim())throw{code:'conflict',field:f};
+    fields[fid]=toCell(f,changes[f][1]);
+  }
+  await mcp.callTool(SERVER,'update_records_for_table',{baseId:BASE_ID,tableId:TABLES.tickets,records:[{id:now._id,fields}],typecast:true});
+}
+async function commit(fn,okMsg){
+  if(S.busy||S.readonly||!mcp)return false;
+  S.busy=true;let ok=false;
+  try{await fn();ok=true;if(okMsg)toast(okMsg)}
+  catch(e){const[m,k]=writeError(e);toast(m,k)}
+  S.busy=false;
+  try{await mcp.invalidate(SERVER,'list_records_for_table')}catch(e){}
+  await loadAll();
+  return ok;
+}
+function moveTicket(key,status,groupId,beforeKey){
+  const t=S.tickets.find(x=>x.Key===key);if(!t||S.busy||S.readonly)return;
+  const ch={};
+  if(status!==statusOf(t))ch.Status=[t.Status,status];
+  if(groupId!==groupOf(t)){
+    if(S.groupBy==='epic'){const e=S.epics.find(x=>x['Epic Key']===groupId);ch['Epic Key']=[t['Epic Key'],e?e['Epic Key']:''];ch.Epic=[t.Epic,e?e.Epic:'']}
+    else if(S.groupBy==='assignee')ch.Assignee=[t.Assignee,groupId==='~none'?'':groupId];
+    else{toast('Tickets cannot change lane by dragging in this grouping.','warn');return}
+  }
+  const cell=S.tickets.filter(x=>x.Key!==key&&statusOf(x)===status&&groupOf(x)===groupId).sort((a,b)=>a._rank-b._rank);
+  let rank=null;
+  if(beforeKey&&beforeKey!==key){const i=cell.findIndex(x=>x.Key===beforeKey);if(i>=0){const nx=cell[i]._rank,pv=i>0?cell[i-1]._rank:null;rank=pv==null?nx-1:(pv+nx)/2}}
+  else if(Object.keys(ch).length){rank=cell.length?cell[cell.length-1]._rank+1:t._rank}
+  if(rank!=null&&rank!==t._rank&&rank<1e9)ch.Rank=[null,Math.round(rank*1000)/1000];
+  if(!Object.keys(ch).length)return;
+  Object.keys(ch).forEach(f=>{t[f]=String(ch[f][1])});if(ch.Rank)t._rank=ch.Rank[1];
+  renderBoard();
+  commit(()=>writeFields(key,ch),key+' moved');
+}
+function formValues(){
+  const ek=$('dEpic').value,e=S.epics.find(x=>x['Epic Key']===ek);
+  return{Summary:$('dSummary').value.trim(),Status:$('dStatus').value,'Epic Key':ek,Epic:e?e.Epic:'',Type:$('dType').value,Priority:$('dPriority').value,Assignee:$('dAssignee').value.trim(),Labels:$('dLabels').value.trim(),Details:$('dDetails').value.trim()};
+}
+async function saveDetail(){
+  const v=formValues();if(!v.Summary){toast('A ticket needs a summary.','warn');return}
+  if(S.sel==='~new'){
+    let newKey='';
+    const ok=await commit(async()=>{
+      const all=await freshTickets();let maxN=0,maxR=0,prefix=CONFIG.KEY_PREFIX||'TKT';
+      all.forEach(t=>{const m=/^([A-Za-z]+)-(\d+)$/.exec(t.Key);if(m){prefix=m[1];maxN=Math.max(maxN,+m[2])}const x=parseFloat(t.Rank);if(!isNaN(x))maxR=Math.max(maxR,x)});
+      newKey=prefix+'-'+(maxN+1);
+      const row=Object.assign({},v,{Key:newKey,Requester:S.me||'',Rank:Math.floor(maxR)+1}),fields={};
+      Object.keys(row).forEach(f=>{const c=toCell(f,row[f]);if(F.tickets[f]&&c!==null&&c!=='')fields[F.tickets[f]]=c});
+      await mcp.callTool(SERVER,'create_records_for_table',{baseId:BASE_ID,tableId:TABLES.tickets,records:[{fields}],typecast:true});
+    });
+    if(ok){toast(newKey+' created');S.draftNew=null;S.sel=newKey;S.dirty=false;renderAll()}
+    return;
+  }
+  const t=S.tickets.find(x=>x.Key===S.sel);if(!t)return;
+  const ch={};Object.keys(v).forEach(f=>{if(F.tickets[f]&&v[f]!==t[f])ch[f]=[t[f],v[f]]});
+  if(!Object.keys(ch).length){toast('Nothing changed.');return}
+  const key=t.Key;S.dirty=false;
+  await commit(()=>writeFields(key,ch),key+' saved');
+  renderDetail();
+}
+async function postComment(){
+  const body=$('cBody').value.trim(),key=S.sel;if(!body||!key)return;
+  if(!S.me){toast('Choose who you are in the "I am" menu first, so the comment has an author.','warn');$('iam').focus();return}
+  const id='C-'+Date.now().toString(36)+'-'+initials(S.me);
+  await commit(async()=>{
+    await mcp.callTool(SERVER,'create_records_for_table',{baseId:BASE_ID,tableId:TABLES.comments,records:[{fields:{[F.comments['Comment ID']]:id,[F.comments['Ticket Key']]:key,[F.comments.Author]:S.me,[F.comments['Created At (UTC)']]:new Date().toISOString(),[F.comments.Body]:body}}]});
+    delete S.cdrafts[key];store.set('cdrafts',S.cdrafts);
+    if(S.sel===key&&$('cBody'))$('cBody').value='';
+  },'Comment posted');
+}
+
+/* ── Events ── */
+function select(key){if(S.dirty&&S.sel&&S.sel!==key){toast('Unsaved edits on '+(S.sel==='~new'?'the new ticket':S.sel)+' were discarded.','warn')}S.sel=key;S.dirty=false;renderBoard();renderDetail()}
+document.addEventListener('click',e=>{
+  const x=e.target.closest('[data-close],[data-tog],[data-add],[data-col],[data-open],[data-relrm],[data-reladd],[data-expand],[data-del],[data-delno],[data-delyes],#scrim,.card');if(!x)return;
+  if(x.dataset.del||x.dataset.delno){const b=$('delBox');if(b){b.hidden=!x.dataset.del;if(x.dataset.del)b.scrollIntoView({block:'nearest'})}return}
+  if(x.dataset.delyes){deleteTicket();return}
+  if(x.id==='scrim'||x.dataset.expand){setExpanded(x.id==='scrim'?false:!S.expanded);return}
+  if(x.dataset.open){select(x.dataset.open);return}
+  if(x.dataset.relrm){removeRelated(x.dataset.relrm);return}
+  if(x.dataset.reladd){addRelated();return}
+  if(x.dataset.close){S.sel=null;S.draftNew=null;S.dirty=false;renderBoard();renderDetail();return}
+  if(x.dataset.tog!=null){const k=S.groupBy+':'+x.dataset.tog;S.collapsed[k]=!S.collapsed[k];store.set('collapsed',S.collapsed);renderBoard();return}
+  if(x.dataset.col){S.phoneStatus=x.dataset.col;renderBoard();return}
+  if(x.dataset.add){
+    const c=x.closest('.cell'),g=c.dataset.group,epic=S.groupBy==='epic'?S.epics.find(q=>q['Epic Key']===g):null;
+    startNew(c.dataset.status,epic,S.groupBy==='assignee'&&g!=='~none'?g:'');return;
+  }
+  if(x.classList.contains('card'))select(x.dataset.key);
+});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('card')){e.preventDefault();select(e.target.dataset.key)}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='relIn'){e.preventDefault();addRelated()}});
+/* Expand or collapse the detail panel in place, without redrawing it, so nothing being typed is lost. */
+function startNew(status,epic,assignee){
+  const v=visibleStatuses();
+  S.draftNew={Key:'',Summary:'',Status:status||(v.length?v[0].Status:'To Do'),'Epic Key':epic?epic['Epic Key']:'',Epic:epic?epic.Epic:'',Type:'Task',Priority:'',Assignee:assignee||'',Labels:'',Details:''};
+  select('~new');const s=$('dSummary');if(s)s.focus();
+}
+$('newTicket').addEventListener('click',()=>startNew());
+/* Delete a ticket, its comments, and any links other tickets hold to it. Asked for in the detail panel and confirmed there first. */
+function deleteTicket(){
+  const key=S.sel;if(!key||key==='~new')return;
+  commit(async()=>{
+    const now=(await freshTickets()).find(t=>t.Key===key);
+    if(!now||!now._id)throw{code:'gone'};
+    await mcp.callTool(SERVER,'delete_records_for_table',{baseId:BASE_ID,tableId:TABLES.tickets,recordIds:[now._id]});
+    delete S.cdrafts[key];store.set('cdrafts',S.cdrafts);
+    if(S.sel===key){S.sel=null;S.dirty=false}
+    try{
+      const ids=S.comments.filter(c=>c['Ticket Key']===key&&c._id).map(c=>c._id);
+      for(let i=0;i<ids.length;i+=50)await mcp.callTool(SERVER,'delete_records_for_table',{baseId:BASE_ID,tableId:TABLES.comments,recordIds:ids.slice(i,i+50)});
+      for(const o of S.tickets.filter(x=>x.Key!==key&&relKeys(x.Related).includes(key)))await writeFields(o.Key,{Related:[null,relKeys(o.Related).filter(k=>k!==key).join('; ')]});
+    }catch(e){toast(key+' was deleted, but some of its comments or links could not be cleaned up.','warn')}
+  },key+' deleted');
+}
+function setExpanded(on){
+  S.expanded=!!on;store.set('expanded',S.expanded);
+  document.body.classList.toggle('dx',S.expanded&&!!S.sel);
+  const b=document.querySelector('[data-expand]');if(b)b.textContent=S.expanded?'Collapse':'Expand';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.expanded&&S.sel)setExpanded(false)});
+document.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='dform')saveDetail();else if(e.target.id==='cform')postComment()});
+document.addEventListener('input',e=>{
+  if(e.target.id==='cBody'&&S.sel){if(e.target.value)S.cdrafts[S.sel]=e.target.value;else delete S.cdrafts[S.sel];store.set('cdrafts',S.cdrafts);return}
+  if(e.target.closest&&e.target.closest('#dform'))S.dirty=true;
+});
+/* Paste: insert the clipboard's plain text ourselves, for views where the default paste does not reach the field. */
+document.addEventListener('paste',e=>{
+  const t=e.target;if(!t||t.disabled||t.readOnly)return;
+  const isArea=t.tagName==='TEXTAREA',isInput=t.tagName==='INPUT'&&(!t.type||t.type==='text'||t.type==='search');
+  if(!isArea&&!isInput)return;
+  let txt='';try{txt=e.clipboardData?e.clipboardData.getData('text/plain'):''}catch(x){}
+  if(!txt)return;
+  e.preventDefault();
+  if(isInput)txt=txt.replace(/\s*\r?\n\s*/g,' ');
+  const s=t.selectionStart==null?t.value.length:t.selectionStart,en=t.selectionEnd==null?s:t.selectionEnd;
+  t.setRangeText(txt,s,en,'end');
+  t.dispatchEvent(new Event('input',{bubbles:true}));
+});
+$('q').addEventListener('input',e=>{S.filters.q=e.target.value;renderBoard()});
+[['fAssignee','assignee'],['fType','type'],['fLabel','label'],['fRequester','requester']].forEach(([id,k])=>$(id).addEventListener('change',e=>{S.filters[k]=e.target.value;renderBoard()}));
+$('groupBy').addEventListener('change',e=>{S.groupBy=e.target.value;store.set('groupBy',S.groupBy);renderBoard()});
+$('iam').addEventListener('change',e=>{S.me=e.target.value;S.meChosen=!!S.me;store.set('me',S.me);if(!S.me)S.me=guessMe();renderTools();renderBoard();renderComments()});
+$('mine').addEventListener('click',()=>{if(!S.me){toast('Choose who you are in the "I am" menu first.','warn');$('iam').focus();return}S.filters.mine=!S.filters.mine;renderTools();renderBoard()});
+$('wont').addEventListener('click',()=>{S.showWont=!S.showWont;store.set('showWont',S.showWont);renderTools();renderBoard()});
+$('refresh').addEventListener('click',()=>{if(!mcp){toast('This view has no connector access, so there is nothing to refresh.','warn');return}S.conn=S.tickets.length?S.conn:'linking';renderConn();loadAll(true)});
+
+/* Drag and drop (pointer devices). On touch, status and epic change from the detail panel. */
+const lanes=$('lanes');
+function clearHot(){lanes.querySelectorAll('.hot,.before').forEach(n=>n.classList.remove('hot','before'))}
+lanes.addEventListener('dragstart',e=>{const c=e.target.closest('.card');if(!c||S.readonly||S.busy){e.preventDefault();return}S.dragKey=c.dataset.key;c.classList.add('drag');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',S.dragKey)}catch(x){}});
+lanes.addEventListener('dragend',()=>{S.dragKey=null;clearHot();lanes.querySelectorAll('.drag').forEach(n=>n.classList.remove('drag'))});
+lanes.addEventListener('dragover',e=>{if(!S.dragKey)return;const cell=e.target.closest('.cell');if(!cell)return;e.preventDefault();e.dataTransfer.dropEffect='move';clearHot();cell.classList.add('hot');const c=e.target.closest('.card');if(c&&c.dataset.key!==S.dragKey)c.classList.add('before')});
+lanes.addEventListener('drop',e=>{if(!S.dragKey)return;const cell=e.target.closest('.cell');if(!cell)return;e.preventDefault();const c=e.target.closest('.card'),k=S.dragKey;S.dragKey=null;clearHot();moveTicket(k,cell.dataset.status,cell.dataset.group,c?c.dataset.key:null)});
+
+/* ── Boot ── */
+$('proj').textContent='— '+(CONFIG.PROJECT||'Project')+' ———';
+const sc=store.get('schema',null);
+if(sc&&sc.TABLES&&sc.F){Object.assign(TABLES,sc.TABLES);Object.keys(F).forEach(k=>{F[k]=sc.F[k]||{}})}
+const snap=store.get('snapAt',null);
+if(snap&&snap.raw){S.raw=snap.raw;S.storedAt=snap.at||null;rebuild()}
+renderAll();
+setInterval(renderConn,15000);
+const C=window.claude;
+if(!C||!C.use){S.readonly=true;S.conn=S.tickets.length?'ro':'error';notice('<b>Read-only</b>This copy has no connector access. Open the board in claude.ai to read and edit the base.');renderAll()}
+else{
+  C.use('user').then(async u=>{if(!u)return;try{const me=await u.me();S.profileName=me&&me.name||'';if(!S.meChosen){S.me=guessMe();renderTools();renderComments()}}catch(e){}});
+  C.use('mcp').then(m=>{
+    if(!m){S.readonly=true;S.conn=S.tickets.length?'ro':'error';notice('<b>Read-only view</b>Connector access is unavailable for you here, so the board cannot read or change the base.'+(S.tickets.length?' Showing the last data this browser read.':''));renderAll();return}
+    mcp=m;
+    if(!BASE_OK){S.conn='error';notice('<b>Setup not finished</b>This board has not been pointed at an Airtable base yet. Upload the kit to Claude and ask it to follow CLAUDE.md, or set BASE_ID near the top of the script.',true);renderAll();return}
+    loadAll(true);
+  });
+}
+})();
+</script>
