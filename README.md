@@ -95,6 +95,28 @@ You can invite people to the single base or to the whole workspace. Invite to th
 
 **When the board is updated.** If you change `board.html` or a theme, send the new files to your teammates and have each ask Claude to republish it to their existing artifact. Their settings carry over.
 
+## Upgrading from an earlier version
+
+If your board predates the Team table, the Blocked column, due dates and watchers, you can add them to your existing base. Your tickets, comments and board link stay as they are. Nothing is deleted.
+
+Upgrading is optional. Your current board keeps working until you replace it, and the new board also runs on an un-upgraded base; the new features just stay hidden until their fields exist.
+
+1. **Download the latest kit** and unzip it.
+2. **Find the link to your current board.** Claude republishes to the same artifact so the link doesn't change, and in a new chat it needs the link to find it.
+3. **Start a new chat** and attach two things: the new kit (zip or files), and your current configured `board.html`. Your current file holds your base ID, project name and prefix, which carry over. Then say:
+
+   > Upgrade my board, following CLAUDE.md. Here's the link to it: …
+
+4. **Answer Claude's questions.** Claude checks what your base already has, tells you what it will add, and asks before adding it. It also asks who is on your team: a name for each person and the email they use for Claude. Include yourself. Then it:
+   - adds four ticket fields: Due Date, Watchers, Blocked Reason and Blocked On;
+   - adds a Blocked status and column after In Progress;
+   - creates the Team table with your team in it;
+   - republishes the new board to your existing link.
+5. **Open the board and allow access again.** The board now also asks to see your email, which is how it recognises you. Your initials should appear in the avatar at the top right. A `?` means your email in the Team table doesn't match your Claude account; click the avatar to see what Claude shared.
+6. **Bring your teammates across.** Make sure each one is in the Team table with the email they use for Claude. Send them the new `board.html` and the `themes/` folder, and have each ask their own Claude to republish it to their existing board.
+
+The **I am** menu is gone; the avatar replaces it. Names already on tickets should match the Team table. A first name only one person has, like "Alex" for "Alex Rivera", is matched automatically.
+
 ## Using the board
 
 - **Move a ticket:** drag it to another column or lane. On a phone, change Status or Epic in the detail panel.
@@ -166,7 +188,7 @@ Claude can work on the base directly in chat, so the board and the conversation 
 | "Setup problem: no table named…" | A table or field was renamed in Airtable. The board finds them by name: Tickets, Comments, Epics, Statuses. Rename it back, or ask Claude to fix it. |
 | "Airtable refused the change" | Your Airtable permission on the base is Commenter or Read-only. Ask the owner for Editor. |
 | The avatar shows `?` and comments are switched off | The board did not find your Claude account in the **Team** table. Click the avatar to see the name and email Claude shared, and ask the owner to add that email to **Team**. |
-| No Blocked column, due dates or watchers | The base was built from an older version of this kit. Ask Claude to "upgrade my board, following CLAUDE.md". |
+| No Blocked column, due dates or watchers | The base was built from an older version of this kit. See "Upgrading from an earlier version". |
 | A teammate sees an empty board | Their connector has no access to the base. They re-authorize Airtable in Claude and include the shared base. |
 | Drag does nothing on a phone | Touch devices change status and epic from the detail panel. |
 
