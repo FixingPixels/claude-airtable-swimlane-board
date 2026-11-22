@@ -28,6 +28,7 @@ Your data lives in your own Airtable base. The board is a single HTML file with 
 | `README.md` | This file. For you. |
 | `CLAUDE.md` | Setup instructions. For Claude. |
 | `board.html` | The board itself. |
+| `themes/scifi.css` | The board's look. Add more files here to offer more themes. |
 | `sample-data/schema.json` | The four tables and their fields. |
 | `sample-data/*.csv` | A small sample project, "Website Relaunch": 4 epics, 14 tickets, 3 comments. |
 | `preview.png` | The screenshot above. |
@@ -68,7 +69,7 @@ Sharing happens in Airtable, which is why nobody needs a Claude Team plan. Each 
 
 1. Open the base in Airtable and press **Share** at the top right.
 2. Invite them by email with **Editor** permission. Editors can add and change tickets. Commenter and Read-only collaborators can open the board and will be unable to change anything.
-3. Send them two things: this README, and the configured `board.html` that Claude gave you at the end of setup. That file already points at your base.
+3. Send them three things: this README, the configured `board.html` that Claude gave you at the end of setup, and the `themes/` folder. That `board.html` already points at your base.
 
 You can invite people to the single base or to the whole workspace. Invite to the **base** unless you want them to see everything else in the workspace.
 
@@ -76,12 +77,12 @@ You can invite people to the single base or to the whole workspace. Invite to th
 
 1. Accept the Airtable invitation. A free Airtable account is fine.
 2. Add the Airtable connector to their Claude (step 2 above), granting it access to the shared base.
-3. Start a chat, attach your configured `board.html` together with `CLAUDE.md`, and say: *"I'm joining an existing board. Follow CLAUDE.md."*
+3. Start a chat, attach your configured `board.html`, the theme files and `CLAUDE.md`, and say: *"I'm joining an existing board. Follow CLAUDE.md."*
 4. Open the artifact, allow Airtable, and set **I am**.
 
 **Free plan limits worth knowing.** Airtable's Free plan allows 5 collaborators with Editor or Creator permission per workspace, 1,000 records per base, and unlimited Read-only collaborators. For a team of up to five, the Free plan covers it. Check [Airtable's plans page](https://support.airtable.com/docs/airtable-plans) for current numbers.
 
-**When the board is updated.** If you change `board.html`, send the new file to your teammates and have each ask Claude to republish it to their existing artifact. Their settings carry over.
+**When the board is updated.** If you change `board.html` or a theme, send the new files to your teammates and have each ask Claude to republish it to their existing artifact. Their settings carry over.
 
 ## Using the board
 
@@ -106,6 +107,14 @@ All of this is plain data in Airtable. Edit it there and press **Refresh** on th
 
 Or skip the clicking and ask Claude, which can do all of it through the same connector.
 
+### Themes
+
+The board's look comes from a theme file in `themes/`. It ships with one, **scifi**: green on black, a monospace face, scanlines and notched corners. `board.html` holds only the layout, so a theme can change colours, fonts, glows and corners without breaking anything.
+
+To add a theme, copy `themes/scifi.css`, rename it (say `themes/paper.css`), and change the values. Each one is explained in the file. Then add the name to `THEMES` in the `CONFIG` block of `board.html` and republish. Once there are two or more, a **Theme** menu appears in the toolbar. Each person's choice is remembered in their own browser.
+
+Or ask Claude: *"Add a light theme called paper with a blue accent and rounded corners."*
+
 ## Things to ask Claude once it's running
 
 Claude can work on the base directly in chat, so the board and the conversation stay in step.
@@ -116,7 +125,7 @@ Claude can work on the base directly in chat, so the board and the conversation 
 - "What's assigned to me that isn't done?"
 - "Move everything in In Review that's older than a week back to In Progress."
 - "Add an epic called Analytics and move WEB-12 into it."
-- "Change the board's accent colour to amber." (Claude edits `board.html` and republishes.)
+- "Change the board's accent colour to amber." (Claude edits the theme file and republishes.)
 
 ## Good to know
 
@@ -146,4 +155,4 @@ Claude can work on the base directly in chat, so the board and the conversation 
 
 ## Credits
 
-The look follows the cassette-futurism style of [scificn/ui](https://www.scificn.dev/), rebuilt by hand in plain CSS. Board, kit, and docs were built with Claude.
+The scifi theme follows the cassette-futurism style of [scificn/ui](https://www.scificn.dev/), rebuilt by hand in plain CSS. Board, kit, and docs were built with Claude.

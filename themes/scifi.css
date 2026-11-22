@@ -1,0 +1,51 @@
+/* ── Theme: scifi ───────────────────────────────────────────────
+   Cassette-futurism, after scificn/ui: phosphor green on black, a monospace face,
+   scanlines, glows, and notched corners.
+
+   HOW A THEME WORKS
+   board.html holds the layout and reads every colour, font and decoration from the
+   variables below. A theme sets them, and may add its own rules after the :root
+   block for anything the variables do not reach.
+
+   To make a new theme: copy this file to themes/<name>.css (lowercase letters,
+   digits and hyphens), change the values, and add <name> to CONFIG.THEMES in
+   board.html. Every variable in :root is read by the board, so keep them all. */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  color-scheme:dark;                 /* dark or light: native controls and scrollbars follow it */
+
+  /* Colours */
+  --bg:#050505;                      /* page, cards, comments */
+  --surface:#0D0D0D;                 /* lanes, detail panel, buttons, inputs */
+  --raised:#141414;                  /* lane and panel headers, toasts */
+  --line:#252525;                    /* borders and dividers */
+  --text:#E0D5BE;                    /* body text */
+  --muted:#8F8A78;                   /* labels, counts, placeholders */
+  --accent:#00ed3f;                  /* keys, headings, primary buttons, focus */
+  --on-accent:#050505;               /* text on an accent or danger fill */
+  --warn:#ff8800;                    /* WIP limit exceeded, Decision tickets, High priority */
+  --danger:#ff5533;                  /* errors, delete, Bug tickets, Highest priority */
+  --info:#7f9cf0;                    /* Feature tickets */
+  --accent-wash:#00ed3f11;           /* inner glow on the "Base linked" badge */
+  --accent-tint:#00ed3f0d;           /* cell under a dragged card */
+  --accent-inset:#00ed3f29;          /* inner glow on the selected card */
+  --scrim:rgba(0,0,0,.74);           /* behind the expanded ticket overlay */
+
+  /* Type */
+  --font:'IBM Plex Mono','Space Mono',ui-monospace,'Courier New',monospace;
+  --case:uppercase;                  /* labels, buttons, headings; "none" for sentence case */
+
+  /* Effects: use "none" to switch any of them off */
+  --glow:0 0 8px #00ed3f66,0 0 20px #00ed3f33;        /* box glow on hover and focus */
+  --text-glow:0 0 6px #00ed3f99,0 0 14px #00ed3f55;   /* text glow on the title and keys */
+  --danger-glow:0 0 8px #cc220066,0 0 20px #cc220033;
+  --page-bg:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 3px,rgba(255,255,255,.018) 4px),#050505;
+
+  /* Shape */
+  --radius:0;                        /* corner radius on buttons, inputs, cards, panels */
+  --cut-sm:polygon(6px 0%,100% 0%,100% calc(100% - 6px),calc(100% - 6px) 100%,0% 100%,0% 6px);      /* cards, toasts */
+  --cut-md:polygon(10px 0%,100% 0%,100% calc(100% - 10px),calc(100% - 10px) 100%,0% 100%,0% 10px);  /* detail panel, notices */
+  --cut-lg:polygon(16px 0%,100% 0%,100% calc(100% - 16px),calc(100% - 16px) 100%,0% 100%,0% 16px);  /* lanes, expanded overlay */
+}

@@ -9,6 +9,7 @@ Read this whole file before acting. `README.md` is the human's guide; you do not
 | File | Use |
 |---|---|
 | `board.html` | The board. Edit only its `CONFIG` block and `<title>`. |
+| `themes/*.css` | One file per theme. `scifi.css` is the default. The board loads them, so they are published with it. |
 | `sample-data/schema.json` | Table and field definitions, in the shape `create_base` takes. |
 | `sample-data/epics.csv`, `statuses.csv`, `tickets.csv`, `comments.csv` | Sample project "Website Relaunch". Column headers are the Airtable field names. |
 | `preview.png` | Screenshot of the finished board. |
@@ -69,7 +70,7 @@ Then verify: count the records in each table and compare with what you sent. Sam
 
 ## Step 5. Configure and publish the board
 
-1. Copy `board.html` to your working folder.
+1. Copy `board.html` and the `themes/` folder to your working folder, keeping `themes/` next to `board.html`.
 2. In the `CONFIG` block near the top of the `<script>`, set:
    - `BASE_ID` to the new base's ID
    - `PROJECT` to the project name
@@ -77,7 +78,7 @@ Then verify: count the records in each table and compare with what you sent. Sam
    - `SERVER` only if the person's Airtable connector appears under a different name than "Airtable"
 3. Set `<title>` to the project name followed by "Board", for example `<title>Website Relaunch Board</title>`.
 4. Change nothing else. The file has no doctype, `<html>`, or `<body>` tags on purpose; the artifact publisher adds them.
-5. Publish it as a plain HTML artifact (not a typed artifact such as Dashboard or Design) with these capabilities:
+5. Publish it as a plain HTML artifact (not a typed artifact such as Dashboard or Design). Publish every theme file listed in `CONFIG.THEMES` alongside it with `files`, at the same relative path, for example `{"themes/scifi.css": "themes/scifi.css"}`. Without them the board falls back to a plain look. Use these capabilities:
 
 ```json
 {
@@ -110,8 +111,8 @@ Tell the person, briefly:
 1. The board is published; open it and **allow Airtable** when asked. The badge should read "Base linked".
 2. Set the **I am** menu to their name.
 3. Give them the link to the Airtable base.
-4. Give them the configured `board.html` as a file, and say it is the one to send teammates.
-5. To share: invite people to the base in Airtable as **Editor**, send them that `board.html` and `CLAUDE.md`, and each person asks their own Claude to "join an existing board". Point them to the README section "Sharing the board with other people".
+4. Give them the configured `board.html` as a file, and say it is the one to send teammates together with the `themes/` folder.
+5. To share: invite people to the base in Airtable as **Editor**, send them that `board.html`, the `themes/` folder and `CLAUDE.md`, and each person asks their own Claude to "join an existing board". Point them to the README section "Sharing the board with other people".
 6. What you could not verify: that the board loads for them. Ask them to tell you what the badge says if it does not turn to "Base linked".
 
 ## Joining an existing board
@@ -120,14 +121,21 @@ The person has a `board.html` with `CONFIG.BASE_ID` already set.
 
 1. Check the connector (step 1).
 2. Call `list_tables_for_base` with that base ID. If it fails or returns nothing, their Airtable account or their connector has no access to the base. Tell them to accept the Airtable invitation, then re-authorize the Airtable connector and include that base. Stop until that is done.
-3. Publish `board.html` unchanged, with the capabilities in step 5.
+3. Publish `board.html` unchanged, with its theme files and the capabilities in step 5. If the person did not receive the `themes/` folder, use the ones from this kit, and tell them any custom theme named in `CONFIG.THEMES` is missing.
 4. Hand over as in step 6, items 1 and 2. If their Airtable permission is Commenter or Read-only, tell them the board will open and refuse changes.
 
 Create nothing in Airtable during a join.
 
 ## After setup: working with the board
 
-**Republishing.** When the person asks for a change to the board, edit the same file and publish to the same artifact so the link stays the same. Give them the new `board.html` for teammates.
+**Republishing.** When the person asks for a change to the board, edit the same file and publish to the same artifact so the link stays the same, with the theme files. Give them the new `board.html` (and any changed theme files) for teammates.
+
+**Themes.** The look lives in `themes/<name>.css`; `board.html` holds only layout. A theme sets the variables in the `:root` block of `themes/scifi.css`, which documents each one, and may add its own rules after it.
+
+- **Changing the look** ("make the accent amber"): edit the theme file, not `board.html`.
+- **A new theme:** copy `themes/scifi.css` to `themes/<name>.css` (lowercase letters, digits, hyphens), set every variable, add `<name>` to `CONFIG.THEMES`, and publish the new file with the board. A **Theme** menu appears in the toolbar once `CONFIG.THEMES` has two or more names. Each viewer's choice is remembered in their browser.
+- **The default theme** is `CONFIG.THEME`. It must be in `CONFIG.THEMES`.
+- Fonts load with `@import` from Google Fonts at the top of the theme file. The artifact allows stylesheets from no other host.
 
 **Working on tickets in chat.** You can read and change the base directly. Keep to the board's conventions so both stay consistent:
 
