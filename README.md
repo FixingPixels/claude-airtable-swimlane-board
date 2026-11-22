@@ -10,12 +10,17 @@ I built this because I wanted Jira's epic swimlanes without Jira. It took a few 
 
 - **Swim lanes by epic**, with a progress bar and a count per status on every lane
 - **Drag and drop** between columns (status), between lanes (epic), and within a cell (order)
-- **Ticket detail panel** that expands to a full overlay: summary, status, epic, type, priority, assignee, labels, details
+- **Ticket detail panel** that expands to a full overlay: summary, status, epic, type, priority, assignee, labels, due date, watchers, details
+- **A Blocked column** that makes every blocked ticket say what it is waiting on: another ticket or a team member
+- **Due dates** that turn amber when due today or tomorrow and red when overdue
+- **Watchers**, and a Watching filter to see the tickets you follow
+- **Knows who you are**: the board matches your Claude account to a Team table, so there is nothing to pick. People not on the team can look and move cards but not comment or create
 - **Comments** on every ticket, with drafts saved as you type
 - **Related tickets**, linked in both directions
-- **Filters**: search, Mine, assignee, type, label, requester, plus group-by-assignee
+- **Filters**: search, Mine, Watching, assignee, type, label, requester, plus group-by-assignee
 - **WIP limits** per column, set in Airtable
 - **Create and delete** tickets from the board
+- **Two themes** to switch between, and room for your own
 - **Works on a phone**, one status column at a time
 - **Shared with your team through Airtable**, with no Claude Team plan needed
 
@@ -28,9 +33,9 @@ Your data lives in your own Airtable base. The board is a single HTML file with 
 | `README.md` | This file. For you. |
 | `CLAUDE.md` | Setup instructions. For Claude. |
 | `board.html` | The board itself. |
-| `themes/scifi.css` | The board's look. Add more files here to offer more themes. |
+| `themes/scifi.css`, `themes/agency.css` | The board's two looks. Add more files here to offer more themes. |
 | `sample-data/schema.json` | The four tables and their fields. |
-| `sample-data/*.csv` | A small sample project, "Website Relaunch": 4 epics, 14 tickets, 3 comments. |
+| `sample-data/*.csv` | A small sample project, "Website Relaunch": 4 epics, 14 tickets, 3 comments, and a made-up team of three. |
 | `preview.png` | The screenshot above. |
 
 ## Setup: about ten minutes
@@ -53,13 +58,18 @@ Start a new chat, attach the zip, and say:
 
 > Set up this board for me. Follow CLAUDE.md.
 
-Claude will ask for a project name and a short ticket prefix (the sample uses `WEB`, giving `WEB-1`, `WEB-2`…), and whether you want the sample project loaded or an empty board. It then creates the Airtable base, fills it, points the board at it, and publishes the board as an artifact.
+Claude will ask for:
+- a project name and a short ticket prefix (the sample uses `WEB`, giving `WEB-1`, `WEB-2`…);
+- whether you want the sample project loaded or an empty board;
+- the people on your team, with the email each one uses for Claude. Include yourself.
+
+It then creates the Airtable base, fills it, points the board at it, and publishes the board as an artifact.
 
 ### 4. Open the board
 
-Open the artifact Claude publishes. The first time, Claude asks whether the board may use Airtable. Allow it. The badge at the top right turns to **Base linked** and the lanes fill in.
+Open the artifact Claude publishes. The first time, Claude asks whether the board may use Airtable and see your name and email. Allow both. The badge at the top left turns to **Base linked** and the lanes fill in.
 
-Set the **I am** menu to your name. It signs your comments and drives the **Mine** filter.
+Your initials appear in the round avatar at the top right. The board found you in the Team table by your Claude email, and it uses that to sign your comments and drive the **Mine** and **Watching** filters. Click the avatar to see who the board thinks you are.
 
 ## Sharing the board with other people
 
@@ -67,9 +77,10 @@ Sharing happens in Airtable, which is why nobody needs a Claude Team plan. Each 
 
 **What you do, once per person:**
 
-1. Open the base in Airtable and press **Share** at the top right.
-2. Invite them by email with **Editor** permission. Editors can add and change tickets. Commenter and Read-only collaborators can open the board and will be unable to change anything.
-3. Send them three things: this README, the configured `board.html` that Claude gave you at the end of setup, and the `themes/` folder. That `board.html` already points at your base.
+1. Add them to the **Team** table in the base: their name and the email they use for Claude. This is how the board recognises them. Without it they can look and move cards, but not comment or create tickets.
+2. Open the base in Airtable and press **Share** at the top right.
+3. Invite them by email with **Editor** permission. Editors can add and change tickets. Commenter and Read-only collaborators can open the board and will be unable to change anything.
+4. Send them three things: this README, the configured `board.html` that Claude gave you at the end of setup, and the `themes/` folder. That `board.html` already points at your base.
 
 You can invite people to the single base or to the whole workspace. Invite to the **base** unless you want them to see everything else in the workspace.
 
@@ -78,7 +89,7 @@ You can invite people to the single base or to the whole workspace. Invite to th
 1. Accept the Airtable invitation. A free Airtable account is fine.
 2. Add the Airtable connector to their Claude (step 2 above), granting it access to the shared base.
 3. Start a chat, attach your configured `board.html`, the theme files and `CLAUDE.md`, and say: *"I'm joining an existing board. Follow CLAUDE.md."*
-4. Open the artifact, allow Airtable, and set **I am**.
+4. Open the artifact, allow Airtable, and check that the avatar at the top right shows their initials.
 
 **Free plan limits worth knowing.** Airtable's Free plan allows 5 collaborators with Editor or Creator permission per workspace, 1,000 records per base, and unlimited Read-only collaborators. For a team of up to five, the Free plan covers it. Check [Airtable's plans page](https://support.airtable.com/docs/airtable-plans) for current numbers.
 
@@ -91,7 +102,10 @@ You can invite people to the single base or to the whole workspace. Invite to th
 - **Add a ticket:** **+ New ticket** in the header, or the button that appears at the bottom of any cell.
 - **Edit:** click a card. **Expand** gives you room to write. **Save changes** saves the fields; comments and related links save on their own.
 - **Delete:** **Delete ticket** in the detail panel, then confirm. Its comments go with it.
-- **Won't Do:** a hidden fifth status for things you decided against. Toggle the column from the toolbar.
+- **Blocked:** set a ticket to Blocked and say what it is waiting on: another ticket (by key) or a team member. The board won't save a blocked ticket without both. Dragging a card onto Blocked opens it so you can fill that in. Moving it out of Blocked clears it.
+- **Due dates and watchers:** set them in the detail panel. Cards show the date, and an eye with the number of watchers.
+- **Filter:** All tickets, **Mine** (assigned to you) or **Watching** (you're a watcher).
+- **Won't Do:** a status for things you decided against. It sits folded at the end of the board; click the eye to open it, and the slashed eye to fold it again. You can drop cards on the folded strip.
 
 ## Making it yours
 
@@ -104,14 +118,21 @@ All of this is plain data in Airtable. Edit it there and press **Refresh** on th
 | Set a WIP limit | Put a number in **WIP Limit** on that row of **Statuses** |
 | Add or rename a column | Edit **Statuses**, then add the same name to the Status choices in **Tickets** |
 | Hide a column | Untick **Show As Column** |
+| Add a team member | Add a row to **Team**: name and the email they use for Claude, **Active** ticked |
+| Remove someone from the pickers | Untick **Active** on their **Team** row. Their name stays on old tickets |
 
 Or skip the clicking and ask Claude, which can do all of it through the same connector.
 
 ### Themes
 
-The board's look comes from a theme file in `themes/`. It ships with one, **scifi**: green on black, a monospace face, scanlines and notched corners. `board.html` holds only the layout, so a theme can change colours, fonts, glows and corners without breaking anything.
+The board's look comes from a theme file in `themes/`. It ships with two, and the **Theme** menu in the toolbar switches between them. Each person's choice is remembered in their own browser.
 
-To add a theme, copy `themes/scifi.css`, rename it (say `themes/paper.css`), and change the values. Each one is explained in the file. Then add the name to `THEMES` in the `CONFIG` block of `board.html` and republish. Once there are two or more, a **Theme** menu appears in the toolbar. Each person's choice is remembered in their own browser.
+- **scifi** (the default): green on black, a monospace face, scanlines and notched corners.
+- **agency**: ink on paper with one blue accent, a serif headline, rounded corners and soft shadows.
+
+`board.html` holds only the layout, so a theme can change colours, fonts, glows and corners without breaking anything.
+
+To add a theme, copy `themes/scifi.css`, rename it (say `themes/paper.css`), and change the values. Each one is explained in the file. Then add the name to `THEMES` in the `CONFIG` block of `board.html` and republish. For a look that goes further, add your own rules after the values, as `agency.css` does.
 
 Or ask Claude: *"Add a light theme called paper with a blue accent and rounded corners."*
 
@@ -144,6 +165,8 @@ Claude can work on the base directly in chat, so the board and the conversation 
 | "Not allowed in this view" | Press Refresh and allow Airtable when asked. |
 | "Setup problem: no table named…" | A table or field was renamed in Airtable. The board finds them by name: Tickets, Comments, Epics, Statuses. Rename it back, or ask Claude to fix it. |
 | "Airtable refused the change" | Your Airtable permission on the base is Commenter or Read-only. Ask the owner for Editor. |
+| The avatar shows `?` and comments are switched off | The board did not find your Claude account in the **Team** table. Click the avatar to see the name and email Claude shared, and ask the owner to add that email to **Team**. |
+| No Blocked column, due dates or watchers | The base was built from an older version of this kit. Ask Claude to "upgrade my board, following CLAUDE.md". |
 | A teammate sees an empty board | Their connector has no access to the base. They re-authorize Airtable in Claude and include the shared base. |
 | Drag does nothing on a phone | Touch devices change status and epic from the detail panel. |
 

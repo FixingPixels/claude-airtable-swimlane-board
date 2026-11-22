@@ -9,15 +9,13 @@
   --bg:#111; --surface:#1a1a1a; --raised:#222; --line:#333; --text:#ddd; --muted:#999;
   --accent:#4c9; --on-accent:#111; --warn:#e90; --danger:#e54; --info:#79e;
   --accent-wash:transparent; --accent-tint:#44cc991a; --accent-inset:transparent; --scrim:rgba(0,0,0,.7);
-  --font:ui-monospace,'Courier New',monospace; --case:uppercase;
+  --font:ui-monospace,'Courier New',monospace; --font-display:var(--font); --font-data:var(--font); --case:uppercase; --track:1;
   --glow:none; --text-glow:none; --danger-glow:none; --page-bg:var(--bg);
   --radius:0; --cut-sm:none; --cut-md:none; --cut-lg:none;
 }
-</style>
-<link id="themeCss" rel="stylesheet" href="themes/scifi.css">
-<style>
 *,*::before,*::after{box-sizing:border-box}
-.badge,.btn,.in,.notice,.lane,.card,.typ,.chip,.who,aside,.cmt,.relchip,.toast,.add,.tog{border-radius:var(--radius)}
+[hidden]{display:none!important}
+.badge,.btn,.in,.notice,.lane,.card,.typ,.chip,.who,aside,.cmt,.relchip,.toast,.add,.tog,.meav,.mepop,.wchip,.blockbox,.colhide,.colfold{border-radius:var(--radius)}
 html{background:var(--bg)}
 body{
   background:var(--page-bg);
@@ -32,12 +30,23 @@ a:hover{text-shadow:var(--text-glow)}
 button,input,select,textarea{font-family:inherit;color:inherit}
 :focus-visible{outline:1px solid var(--accent);outline-offset:2px;box-shadow:var(--glow)}
 .app{display:flex;flex-direction:column;gap:16px;max-width:1800px;margin:0 auto}
-.lbl{font-size:11px;letter-spacing:.12em;text-transform:var(--case);color:var(--muted)}
+.lbl{font-size:11px;letter-spacing:calc(.12em * var(--track));text-transform:var(--case);color:var(--muted)}
 
-header.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
-.brand{display:flex;flex-direction:column;gap:2px;flex:1 1 280px;min-width:0}
-h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:var(--case);color:var(--accent);text-shadow:var(--text-glow);text-wrap:balance}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:.1em;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+/* Header: connection status and project above the title; the viewer's avatar top right. */
+header.top{position:relative;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-direction:column;gap:2px;flex:1 1 280px;min-width:0;padding-right:52px}
+.connrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-bottom:8px}
+h1{margin:0;font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:calc(.08em * var(--track));text-transform:var(--case);color:var(--accent);text-shadow:var(--text-glow);text-wrap:balance}
+.mebox{position:absolute;top:0;right:0;z-index:30}
+.meav{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;font-size:12px;font-weight:600;letter-spacing:calc(.04em * var(--track));background:var(--surface);border:1px solid var(--accent);color:var(--accent);cursor:pointer}
+.meav:hover,.meav[aria-expanded="true"]{box-shadow:var(--glow)}
+.meav.guest{border-style:dashed;border-color:var(--muted);color:var(--muted)}
+.meav.wait{border-color:var(--line);color:var(--muted)}
+.mepop{position:absolute;top:calc(100% + 8px);right:0;width:min(300px,calc(100vw - 32px));padding:12px 14px;background:var(--raised);border:1px solid var(--line);clip-path:var(--cut-sm);font-size:12px;line-height:1.5;color:var(--text)}
+.mepop b{color:var(--accent);font-weight:600}
+.mepop .em{display:block;margin-top:2px;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.mepop .note{display:block;margin-top:8px;font-size:11px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:calc(.1em * var(--track));border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .badge.ok{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 8px var(--accent-wash)}
 .badge.warn{border-color:var(--warn);color:var(--warn)}
 .badge.err{border-color:var(--danger);color:var(--danger)}
@@ -45,7 +54,7 @@ h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:v
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.badge.scan .dot{animation:none}}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:.1em;background:var(--surface);border:1px solid var(--line);color:var(--text);cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 16px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:calc(.1em * var(--track));background:var(--surface);border:1px solid var(--line);color:var(--text);cursor:pointer;white-space:nowrap;transition:all .15s}
 .btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:var(--glow)}
 .btn.exec{background:transparent;border-color:var(--accent);color:var(--accent)}
 .btn.exec:hover,.btn.exec.on{background:var(--accent);color:var(--on-accent);box-shadow:var(--glow)}
@@ -57,22 +66,32 @@ h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:v
 .tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
 .fld.grow{flex:1 1 220px}
-.fld[hidden]{display:none}
 .in{width:100%;height:36px;padding:0 12px;font-size:12px;background:var(--surface);border:1px solid var(--line);color:var(--text);outline:none;caret-color:var(--accent);transition:all .15s}
 textarea.in{height:auto;padding:8px 12px;line-height:1.5;resize:vertical}
-select.in{padding-right:8px;cursor:pointer;text-transform:var(--case);letter-spacing:.06em;font-size:11px}
+select.in{padding-right:8px;cursor:pointer;text-transform:var(--case);letter-spacing:calc(.06em * var(--track));font-size:11px}
 .in:focus{border-color:var(--accent);box-shadow:var(--glow)}
 .in::placeholder{color:var(--muted)}
 .in:disabled{opacity:.6}
 
 .notice{padding:12px 16px;background:var(--surface);border:1px solid var(--warn);color:var(--text);clip-path:var(--cut-md);font-size:13px}
 .notice.err{border-color:var(--danger)}
-.notice b{color:var(--warn);font-weight:600;letter-spacing:.08em;text-transform:var(--case);font-size:11px;display:block;margin-bottom:2px}
+.notice b{color:var(--warn);font-weight:600;letter-spacing:calc(.08em * var(--track));text-transform:var(--case);font-size:11px;display:block;margin-bottom:2px}
 
 .work{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px}
 main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column}
-.colhead{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));border-bottom:1px solid var(--line)}
-.colbtn{display:flex;align-items:baseline;gap:8px;padding:8px 12px;margin-bottom:-1px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:.12em;color:var(--text);background:none;border:0;border-bottom:2px solid transparent;text-align:left;cursor:default;min-width:0}
+.colhead{display:grid;grid-template-columns:var(--tpl,repeat(var(--cols),minmax(0,1fr)));border-bottom:1px solid var(--line)}
+.colh{display:flex;align-items:center;min-width:0}
+.colh .colbtn{flex:1}
+/* Won't Do folds to a narrow strip; the eye buttons open and fold it. */
+.colhide,.colfold{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0;background:none;border:1px solid transparent;color:var(--muted);cursor:pointer}
+.colhide{flex:none;width:28px;height:28px;margin-right:6px}
+.colfold{width:40px;height:30px;margin:0 auto;font-family:var(--font-data);font-size:11px;font-variant-numeric:tabular-nums}
+.colhide:hover,.colfold:hover{border-color:var(--line);color:var(--accent)}
+.colhide svg,.colfold svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.cell.fold{align-items:center;padding:14px 0}
+.cell.fold .vt{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;letter-spacing:calc(.18em * var(--track));text-transform:var(--case);color:var(--muted);white-space:nowrap}
+.cell.fold .vt b{font-family:var(--font-data);letter-spacing:0;color:var(--text)}
+.colbtn{display:flex;align-items:baseline;gap:8px;padding:8px 12px;margin-bottom:-1px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:calc(.12em * var(--track));color:var(--text);background:none;border:0;border-bottom:2px solid transparent;text-align:left;cursor:default;min-width:0}
 .colbtn .n{color:var(--muted);font-variant-numeric:tabular-nums}
 .colbtn .wip{margin-left:auto;color:var(--muted);white-space:nowrap}
 .colbtn.over{color:var(--warn);border-bottom-color:var(--warn)}
@@ -84,21 +103,23 @@ main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column}
 .tog{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:12px;background:transparent;border:1px solid transparent;color:var(--accent);cursor:pointer}
 .tog:hover{border-color:var(--line)}
 .sw{width:10px;height:10px;flex:none;border:1px solid var(--line)}
-.lanehead h2{margin:0;font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:var(--case);color:var(--accent);min-width:0;overflow-wrap:anywhere}
-.stc{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:11px;letter-spacing:.1em;text-transform:var(--case);color:var(--muted)}
+.lanehead h2{margin:0;font-size:14px;font-weight:600;letter-spacing:calc(.1em * var(--track));text-transform:var(--case);color:var(--accent);min-width:0;overflow-wrap:anywhere}
+.lname{margin:0;font-size:14px;font-weight:600;letter-spacing:calc(.1em * var(--track));text-transform:var(--case);color:var(--accent);min-width:0;overflow-wrap:anywhere}
+.stc{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:11px;letter-spacing:calc(.1em * var(--track));text-transform:var(--case);color:var(--muted)}
 .stc span{white-space:nowrap}
 .stc b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
 .stc .zero b{color:var(--muted);font-weight:400}
 .btn.abort{background:transparent;border-color:var(--danger);color:var(--danger)}
 .btn.abort:hover{background:var(--danger);color:var(--on-accent);box-shadow:var(--danger-glow)}
-.bar{margin-left:auto;font-size:12px;white-space:pre;color:var(--muted)}
-.bar i{font-style:normal;color:var(--accent);text-shadow:var(--text-glow)}
-.bar em{font-style:normal;font-size:11px;color:var(--text)}
-.cells{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
+.bar{margin-left:auto;display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.bar .trk{position:relative;display:block;width:120px;height:6px;background:var(--line);overflow:hidden}
+.bar .trk i{position:absolute;inset:0 auto 0 0;background:var(--accent);box-shadow:var(--glow)}
+.bar em{font-style:normal;font-family:var(--font-data);font-size:11px;color:var(--text);font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right}
+.cells{display:grid;grid-template-columns:var(--tpl,repeat(var(--cols),minmax(0,1fr)))}
 .cell{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:72px;padding:12px;border-left:1px solid var(--line)}
 .cell:first-child{border-left:0}
 .cell.hot{background:var(--accent-tint);box-shadow:inset 0 0 0 1px var(--accent)}
-.add{display:inline-flex;align-items:center;justify-content:center;height:32px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:.1em;background:transparent;border:1px dashed var(--line);color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s}
+.add{display:inline-flex;align-items:center;justify-content:center;height:32px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:calc(.1em * var(--track));background:transparent;border:1px dashed var(--line);color:var(--muted);cursor:pointer;opacity:0;transition:opacity .15s}
 .cell:hover .add,.add:focus-visible{opacity:1}
 .add:hover{border-color:var(--accent);color:var(--accent)}
 @media (hover:none){.add{opacity:1}}
@@ -113,19 +134,47 @@ main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column}
 .card.before{box-shadow:inset 0 3px 0 var(--accent)}
 .row{display:flex;align-items:center;gap:10px;min-width:0}
 .row.sp{justify-content:space-between}
-.key{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--accent);white-space:nowrap}
-.typ{display:inline-flex;align-items:center;gap:6px;padding:1px 7px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:.1em;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.key{font-family:var(--font-data);font-size:12px;font-weight:600;letter-spacing:calc(.08em * var(--track));color:var(--accent);white-space:nowrap}
+.typ{display:inline-flex;align-items:center;gap:6px;padding:1px 7px;font-size:11px;font-weight:500;text-transform:var(--case);letter-spacing:calc(.1em * var(--track));border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .typ.bug{border-color:var(--danger);color:var(--danger)}
 .typ.feature{border-color:var(--info);color:var(--info)}
 .typ.decision{border-color:var(--warn);color:var(--warn)}
+.typ .tm{width:6px;height:6px;flex:none;background:currentColor}
 .sum{font-size:13px;line-height:1.45;color:var(--text);overflow-wrap:anywhere}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{padding:0 6px;font-size:11px;letter-spacing:.06em;border:1px solid var(--line);color:var(--muted)}
-.meta{font-size:11px;letter-spacing:.08em;text-transform:var(--case)}
+.chip{padding:0 6px;font-size:11px;letter-spacing:calc(.06em * var(--track));border:1px solid var(--line);color:var(--muted)}
+.meta{font-size:11px;letter-spacing:calc(.08em * var(--track));text-transform:var(--case);flex-wrap:wrap;row-gap:6px}
 .p-highest{color:var(--danger)}.p-high{color:var(--warn)}.p-medium{color:var(--text)}.p-low,.p-none,.cc{color:var(--muted)}
-.who{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 3px;border:1px solid var(--line);color:var(--text)}
+/* Priority as three signal bars; the level sets how many are lit and in what colour. */
+.pri{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pri i{display:inline-flex;align-items:flex-end;gap:2px;height:10px}
+.pri i b{display:block;width:3px;background:var(--line)}
+.pri i b:nth-child(1){height:4px}.pri i b:nth-child(2){height:7px}.pri i b:nth-child(3){height:10px}
+.p-low i b:nth-child(1){background:var(--muted)}
+.p-medium i b:nth-child(-n+2){background:var(--text)}
+.p-high i b{background:var(--warn)}
+.p-highest i b{background:var(--danger)}
+.cc,.due{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-data);white-space:nowrap}
+.due{color:var(--text)}
+.due.soon{color:var(--warn)}
+.due.over{color:var(--danger);font-weight:600}
+.cc svg,.due svg,.blk svg{flex:none;width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+/* Blocked: the "Waiting on" line on cards and the required box in the ticket panel. */
+.blk{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:calc(.06em * var(--track));text-transform:var(--case);color:var(--danger);overflow-wrap:anywhere}
+.blockbox{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:10px 12px 12px;border:1px solid var(--danger)}
+.blockbox .bhead{grid-column:1 / -1;font-size:11px;font-weight:600;letter-spacing:calc(.1em * var(--track));text-transform:var(--case);color:var(--danger)}
+body.dx .blockbox{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Watchers: removable name chips and an "Add watcher" menu. */
+.wbox{display:flex;flex-direction:column;gap:8px;min-width:0}
+.wchips{display:flex;flex-wrap:wrap;gap:6px}
+.wchips:empty{display:none}
+.wchip{display:inline-flex;align-items:center;gap:2px;height:26px;padding:0 4px 0 8px;border:1px solid var(--line);font-size:12px;color:var(--text);max-width:100%}
+.wchip.ro{padding-right:8px}
+.wx{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;padding:0;border:0;background:none;color:var(--muted);font-size:14px;line-height:1;cursor:pointer}
+.wx:hover{color:var(--danger)}
+.who{margin-left:auto;flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 3px;border:1px solid var(--line);color:var(--text)}
 .who.none{border-style:dashed;color:var(--muted)}
-.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:var(--case)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;letter-spacing:calc(.08em * var(--track));text-transform:var(--case)}
 
 aside{flex:1 1 320px;min-width:0;max-width:100%;background:var(--surface);border:1px solid var(--line);clip-path:var(--cut-md);position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
 .dhead{display:flex;align-items:center;gap:8px;padding:9px 14px 9px 18px;background:var(--raised);border-bottom:1px solid var(--line)}
@@ -133,16 +182,16 @@ aside{flex:1 1 320px;min-width:0;max-width:100%;background:var(--surface);border
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .kv{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 12px;font-size:12px}
 .kv span:nth-child(even){overflow-wrap:anywhere}
-.rule{font-size:11px;letter-spacing:.12em;text-transform:var(--case);color:var(--muted)}
+.rule{font-size:11px;letter-spacing:calc(.12em * var(--track));text-transform:var(--case);color:var(--muted)}
 .cmt{display:flex;flex-direction:column;gap:4px;padding:10px;background:var(--bg);border:1px solid var(--line)}
-.cmt .h{display:flex;justify-content:space-between;gap:8px;font-size:11px;letter-spacing:.08em;text-transform:var(--case)}
+.cmt .h{display:flex;justify-content:space-between;gap:8px;font-size:11px;letter-spacing:calc(.08em * var(--track));text-transform:var(--case)}
 .cmt .h b{color:var(--accent);font-weight:500}
 .cmt .h span{color:var(--muted);white-space:nowrap}
 .cmt .b{font-size:12.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
 .acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
 .relchip{display:flex;align-items:center;gap:8px;padding:2px 2px 2px 10px;background:var(--bg);border:1px solid var(--line);min-width:0}
 .relchip.done{opacity:.72}
-.rk{background:none;border:0;padding:0;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--accent);cursor:pointer;white-space:nowrap}
+.rk{background:none;border:0;padding:0;font-size:12px;font-weight:600;letter-spacing:calc(.08em * var(--track));color:var(--accent);cursor:pointer;white-space:nowrap}
 .rk:hover{text-shadow:var(--text-glow)}
 .rs{flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .relchip .lbl{white-space:nowrap}
@@ -169,7 +218,10 @@ body.ro .add,body.ro .edit-only{display:none}
 .phone-only{display:none}
 @media (max-width:760px){
   .colhead{display:flex;overflow-x:auto}
+  .colh{flex:none}
   .colbtn{cursor:pointer;white-space:nowrap;flex:none;min-width:auto}
+  .colfold{width:auto;padding:0 10px;margin:0 4px}
+  body.dx .blockbox{grid-template-columns:minmax(0,1fr)}
   .colbtn.pick{color:var(--accent);border-bottom-color:var(--accent);text-shadow:var(--text-glow)}
   .colbtn .wip{margin-left:0}
   .cells{grid-template-columns:minmax(0,1fr)}
@@ -181,29 +233,32 @@ body.ro .add,body.ro .edit-only{display:none}
   .grid2{grid-template-columns:minmax(0,1fr)}
 }
 </style>
+<!-- The theme loads after the board's own rules, so a theme can override any of them.
+     href is the default theme; keep it in step with CONFIG.THEME. The script below switches to the
+     viewer's saved pick before the page first draws, so the default never flashes. -->
+<link id="themeCss" rel="stylesheet" href="themes/scifi.css">
+<script>try{var t=JSON.parse(localStorage.getItem('slb.theme')||'null');if(/^[a-z0-9-]+$/.test(t||''))document.getElementById('themeCss').setAttribute('href','themes/'+t+'.css')}catch(e){}</script>
 
 <div class="app">
   <header class="top">
     <div class="brand">
-      <div class="lbl" id="proj">— Project ———</div>
-      <h1>Board // Epics &amp; Tickets</h1>
+      <div class="connrow"><span id="conn" class="badge scan"><span class="dot">●</span> <span id="connTxt">Linking to base</span></span><span id="age" class="lbl"></span></div>
+      <div class="lbl" id="proj">Project</div>
+      <h1>Epics &amp; <em>tickets</em></h1>
     </div>
-    <span id="conn" class="badge scan"><span class="dot">●</span> <span id="connTxt">Linking to base</span></span>
-    <span id="age" class="lbl"></span>
     <button id="newTicket" type="button" class="btn exec edit-only">+ New ticket</button>
     <button id="refresh" type="button" class="btn">Refresh</button>
+    <div class="mebox"><button id="meAv" type="button" class="meav wait" aria-haspopup="dialog" aria-expanded="false" aria-controls="mePop" aria-label="Checking who you are">…</button><div id="mePop" class="mepop" role="dialog" aria-label="Signed-in user" hidden></div></div>
   </header>
 
   <div class="tools">
-    <div class="fld grow"><label class="lbl" for="q">Search</label><input id="q" class="in" type="text" placeholder="> key or summary" autocomplete="off"></div>
-    <div class="fld"><span class="lbl">Filter</span><button id="mine" type="button" class="btn exec" aria-pressed="false">▶ Mine</button></div>
+    <div class="fld grow"><label class="lbl" for="q">Search</label><input id="q" class="in" type="text" placeholder="Key or summary" autocomplete="off"></div>
+    <div class="fld"><label class="lbl" for="mine">Filter</label><select id="mine" class="in"><option value="">All tickets</option><option value="mine">Mine</option><option value="watching">Watching</option></select></div>
     <div class="fld"><label class="lbl" for="fAssignee">Assignee</label><select id="fAssignee" class="in"></select></div>
     <div class="fld"><label class="lbl" for="fType">Type</label><select id="fType" class="in"></select></div>
     <div class="fld"><label class="lbl" for="fLabel">Label</label><select id="fLabel" class="in"></select></div>
     <div class="fld"><label class="lbl" for="fRequester">Requester</label><select id="fRequester" class="in"></select></div>
     <div class="fld"><label class="lbl" for="groupBy">Group by</label><select id="groupBy" class="in"><option value="epic">Epic</option><option value="assignee">Assignee</option><option value="none">None</option></select></div>
-    <div class="fld"><label class="lbl" for="iam">I am</label><select id="iam" class="in"></select></div>
-    <div class="fld"><span class="lbl">Column</span><button id="wont" type="button" class="btn" aria-pressed="false">Won't do: hidden</button></div>
     <div class="fld" id="themeFld" hidden><label class="lbl" for="themePick">Theme</label><select id="themePick" class="in"></select></div>
   </div>
 
@@ -232,17 +287,24 @@ const CONFIG={
   PROJECT:'Sample Project', // Shown above the board title.
   KEY_PREFIX:'TKT',         // Prefix for the first ticket key when the base has no tickets yet.
   POLL_SECONDS:120,         // How often the board re-reads tickets and comments. 0 turns polling off.
-  THEMES:['scifi'],         // Theme files in themes/, by name without ".css". The Theme menu appears when there are two or more.
-  THEME:'scifi'             // Theme a viewer sees until they pick another. Must be in THEMES.
+  THEMES:['scifi','agency'],// Theme files in themes/, by name without ".css". The Theme menu appears when there are two or more.
+  THEME:'scifi'             // Theme a viewer sees until they pick another. Must be in THEMES. Also set it in the themeCss link's href at the top of the file.
 };
 const BASE_ID=CONFIG.BASE_ID,SERVER=CONFIG.SERVER;
 const BASE_OK=/^app[A-Za-z0-9]{14}$/.test(BASE_ID);
 const TABLE_NAMES={tickets:'Tickets',comments:'Comments',epics:'Epics',statuses:'Statuses'};
-const TABLES={},F={tickets:{},comments:{},epics:{},statuses:{}};
+/* Optional tables: used when present, ignored when not. */
+const OPTIONAL_TABLES={team:'Team'};
+const TABLES={},F={tickets:{},comments:{},epics:{},statuses:{},team:{}};
 const POLL_MS=Math.max(0,Number(CONFIG.POLL_SECONDS)||0)*1000;
 const TYPES=['Task','Bug','Feature','Chore','Decision'];
 const PRIOS=['Highest','High','Medium','Low'];
-const DEFAULT_STATUSES=[['To Do','1','To Do','TRUE',''],['In Progress','2','In Progress','TRUE',''],['In Review','3','In Progress','TRUE',''],['Done','4','Done','TRUE',''],["Won't Do",'5','Done','FALSE','']];
+const DEFAULT_STATUSES=[['To Do','1','To Do','TRUE',''],['In Progress','2','In Progress','TRUE',''],['Blocked','3','In Progress','TRUE',''],['In Review','4','In Progress','TRUE',''],['Done','5','Done','TRUE',''],["Won't Do",'6','Done','FALSE','']];
+/* Blocked tickets must say what they are waiting on: a reason, and the ticket or team member it names.
+   This applies only when the base has the Blocked Reason and Blocked On fields. */
+const BLOCK_REASONS=['Blocked by Ticket','Waiting on Team Member'];
+const isBlocked=s=>low(s)==='blocked';
+const blockNameLabel=r=>r==='Waiting on Team Member'?'Team member name':'Ticket ID';
 const DENIED=['needs_reauth','server_not_connected','selection_required','server_not_found','blocked_by_policy','approval_required','not_in_manifest','consent_required','not_granted'];
 
 const $=id=>document.getElementById(id);
@@ -264,10 +326,14 @@ $('themePick').innerHTML=THEMES.map(n=>'<option value="'+n+'">'+n+'</option>').j
 $('themeFld').hidden=THEMES.length<2;
 applyTheme(store.get('theme',CONFIG.THEME));
 
-const S={raw:{},tickets:[],comments:[],epics:[],statuses:[],
-  filters:{q:'',mine:false,assignee:'',type:'',label:'',requester:''},
+/* Optional ticket fields: their controls appear only when the base has the field. */
+const has=f=>!!F.tickets[f];
+const canBlock=()=>has('Blocked Reason')&&has('Blocked On');
+
+const S={raw:{},tickets:[],comments:[],epics:[],statuses:[],team:[],email:'',meSource:'',
+  filters:{q:'',mine:'',assignee:'',type:'',label:'',requester:''},
   groupBy:store.get('groupBy','epic'),showWont:store.get('showWont',false),collapsed:store.get('collapsed',{}),
-  me:store.get('me',''),meChosen:!!store.get('me',''),profileName:'',
+  me:'',meChosen:false,userDone:false,profileName:'',
   cdrafts:store.get('cdrafts',{})||{},expanded:!!store.get('expanded',false),
   sel:null,draftNew:null,dirty:false,busy:false,readonly:false,phoneStatus:null,
   conn:'linking',storedAt:null,watching:false,dragKey:null};
@@ -288,7 +354,8 @@ function rebuild(){
   let st=objs('statuses',S.raw.statuses).filter(s=>s.Status);
   if(!st.length)st=DEFAULT_STATUSES.map(r=>({Status:r[0],Order:r[1],Category:r[2],'Show As Column':r[3],'WIP Limit':r[4]}));
   S.statuses=st.sort((a,b)=>(parseFloat(a.Order)||0)-(parseFloat(b.Order)||0));
-  if(!S.meChosen)S.me=guessMe();
+  S.team=TABLES.team?objs('team',S.raw.team).filter(m=>m.Name&&(!F.team.Active||truthy(m.Active))).sort((a,b)=>a.Name.localeCompare(b.Name)):[];
+  resolveMe();
   /* Related links are stored on one ticket and shown on both. */
   const have=new Set(S.tickets.map(t=>t.Key)),rel={};
   const link=(a,b)=>{if(a===b||!have.has(a)||!have.has(b))return;rel[a]=rel[a]||[];if(!rel[a].includes(b))rel[a].push(b)};
@@ -297,19 +364,74 @@ function rebuild(){
 }
 const relKeys=s=>String(s||'').split(/[;,\s]+/).map(x=>x.trim().toUpperCase()).filter(Boolean);
 const keyNum=k=>{const m=/(\d+)$/.exec(k);return m?+m[1]:0};
+/* Team members, and matching a written name to one: exact name, or a first name only one member has ("Chris" = "Chris Collett"). */
+const teamNames=()=>(S.team||[]).map(m=>m.Name);
+function canon(n){
+  n=String(n||'').trim();if(!n||!(S.team||[]).length)return n;
+  const ex=S.team.find(m=>low(m.Name)===low(n));if(ex)return ex.Name;
+  const first=S.team.filter(m=>low(m.Name.split(/\s+/)[0])===low(n.split(/\s+/)[0]));
+  return first.length===1&&n.split(/\s+/).length===1?first[0].Name:n;
+}
+const same=(a,b)=>!!a&&!!b&&low(canon(a))===low(canon(b));
+/* Who is viewing: the Claude account email matched to the Team table, else the exact account name; with no Team table, a guess from the account name. */
+function resolveMe(){
+  /* Email first. Claude only shares it where the viewer's organization allows; otherwise fall back to the exact full account name. */
+  if((S.team||[]).length&&S.email){const m=S.team.find(x=>low(x.Email)===low(S.email));if(m){S.me=m.Name;S.meSource='team';return}}
+  if((S.team||[]).length&&S.profileName){const pn=low(S.profileName.trim().replace(/\s+/g,' '));const m=S.team.find(x=>low(x.Name.trim().replace(/\s+/g,' '))===pn);if(m){S.me=m.Name;S.meSource='team-name';return}}
+  if((S.team||[]).length){S.me='';S.meSource=S.userDone?'guest':'';return}
+  S.me=guessMe();S.meSource=S.me?'profile':(S.userDone?'guest':'');
+}
+const isGuest=()=>S.meSource==='guest';
+function meHint(what){return S.userDone?(TABLES.team?'Your Claude account is not on the board\'s Team list, so you can\'t '+what+'. Ask the board owner to add your email to the Team table.':'The board could not tell who you are, so you can\'t '+what+'. Ask the board owner to add a Team table with your name and email.'):'Still checking who you are. Try again in a moment.'}
+function renderMe(){
+  const b=$('meAv'),pop=$('mePop');if(!b)return;
+  const known=!!S.me;
+  b.className='meav'+(known?'':S.userDone?' guest':' wait');
+  b.textContent=known?initials(S.me):S.userDone?'?':'…';
+  b.setAttribute('aria-label',known?'Signed in as '+S.me:S.userDone?'Viewing as a guest':'Checking who you are');
+  pop.innerHTML=known
+    ?'You are currently logged in as <b>'+esc(S.me)+'</b>'+(S.email?'<span class="em">'+esc(S.email)+'</span>':'')+(S.meSource==='profile'?'<span class="note">Matched from your Claude account name. Add a Team table to the base to match by email.</span>':'')
+      +(S.meSource==='team-name'?'<span class="note">Matched to the Team table by your Claude account name, because Claude did not share your email with this board.</span>':'')
+    :S.userDone?'You are viewing as a <b>guest</b>.'+(S.email?'<span class="em">'+esc(S.email)+'</span>':'')+'<span class="note">This account is not on the board\'s Team list, so you can view and move tickets but not comment or create them. Ask the board owner to add your email to the Team table.</span>'
+      +'<span class="note">Claude shared: name '+(S.profileName?'“'+esc(S.profileName)+'”':'(none)')+', email '+(S.email?esc(S.email):'(not shared)')+'.</span>'
+    :'Checking who you are…';
+}
+function setMePop(open){const b=$('meAv'),pop=$('mePop');pop.hidden=!open;b.setAttribute('aria-expanded',open)}
+document.addEventListener('click',e=>{
+  if(e.target.closest&&e.target.closest('#meAv')){setMePop($('mePop').hidden);return}
+  if(!$('mePop').hidden&&!(e.target.closest&&e.target.closest('#mePop')))setMePop(false);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('mePop').hidden){setMePop(false);$('meAv').focus()}});
 function people(){
   const set=new Map();
-  const add=n=>{n=String(n||'').trim();if(n&&!set.has(low(n)))set.set(low(n),n)};
-  S.tickets.forEach(t=>{add(t.Assignee);add(t.Requester)});S.comments.forEach(c=>add(c.Author));
+  const add=n=>{n=canon(n);if(n&&!set.has(low(n)))set.set(low(n),n)};
+  teamNames().forEach(add);
+  S.tickets.forEach(t=>{add(t.Assignee);add(t.Requester);watchersOf(t).forEach(add);if(t['Blocked Reason']==='Waiting on Team Member')add(t['Blocked On'])});S.comments.forEach(c=>add(c.Author));
   return[...set.values()].sort((a,b)=>a.localeCompare(b));
 }
 function guessMe(){
   const pn=S.profileName.trim();if(!pn)return'';
   const first=pn.split(/\s+/)[0];
+  if((S.team||[]).length){const c=canon(pn);if(teamNames().includes(c))return c;const c1=canon(first);if(teamNames().includes(c1))return c1}
   return people().find(p=>low(p)===low(pn))||people().find(p=>low(p)===low(first))||first;
 }
 const labelsOf=t=>t.Labels?t.Labels.split(/[;,]/).map(s=>s.trim()).filter(Boolean):[];
-const visibleStatuses=()=>S.statuses.filter(s=>truthy(s['Show As Column'])||(S.showWont&&low(s.Category)==='done'&&!truthy(s['Show As Column'])));
+const watchersOf=t=>t.Watchers?t.Watchers.split(/[;,]/).map(s=>canon(s.trim())).filter(Boolean):[];
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function dueHtml(t){
+  const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(t['Due Date']||'');if(!m)return'';
+  const d=new Date(+m[1],+m[2]-1,+m[3]),iso=m[0],now=new Date(),today=ymd(now),tmr=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1));
+  const full=d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+  const done=isDone(t.Status);let cls='',txt=full;
+  if(!done&&iso<today){cls=' over';txt='Overdue · '+full}else if(!done&&iso===today){cls=' soon';txt='Due today'}else if(!done&&iso===tmr){cls=' soon';txt='Due tomorrow'}
+  return'<span class="due'+cls+'" title="Due '+esc(full)+'">'+ICON_DUE+esc(txt)+'</span>';
+}
+/* Done-category statuses not marked Show As Column (Won't Do) stay on the board as a folded column the viewer can open. */
+const isHideable=s=>!truthy(s['Show As Column'])&&low(s.Category)==='done';
+const isFolded=s=>isHideable(s)&&!S.showWont;
+const boardStatuses=()=>S.statuses.filter(s=>truthy(s['Show As Column'])||isHideable(s));
+const visibleStatuses=()=>boardStatuses().filter(s=>!isFolded(s));
+const ICON_EYE_OFF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.9 4.24A9 9 0 0 1 12 4c6.5 0 10 8 10 8a17 17 0 0 1-2.16 3.19M6.6 6.6A17 17 0 0 0 2 12s3.5 8 10 8a9.7 9.7 0 0 0 5.4-1.6"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg>';
 const isDone=name=>{const s=S.statuses.find(x=>x.Status===name);return!!s&&low(s.Category)==='done'};
 function statusOf(t){const v=visibleStatuses();if(S.statuses.some(s=>s.Status===t.Status))return t.Status;return v.length?v[0].Status:t.Status}
 
@@ -317,22 +439,23 @@ function statusOf(t){const v=visibleStatuses();if(S.statuses.some(s=>s.Status===
 function passes(t){
   const f=S.filters;
   if(f.q){const q=low(f.q);if(!low(t.Key).includes(q)&&!low(t.Summary).includes(q))return false}
-  if(f.mine&&(!S.me||low(t.Assignee)!==low(S.me)))return false;
-  if(f.assignee&&(f.assignee==='—'?t.Assignee!=='':t.Assignee!==f.assignee))return false;
+  if(f.mine==='mine'&&(!S.me||!same(t.Assignee,S.me)))return false;
+  if(f.mine==='watching'&&(!S.me||!watchersOf(t).some(w=>same(w,S.me))))return false;
+  if(f.assignee&&(f.assignee==='—'?t.Assignee!=='':canon(t.Assignee)!==f.assignee))return false;
   if(f.type&&t.Type!==f.type)return false;
   if(f.label&&!labelsOf(t).includes(f.label))return false;
-  if(f.requester&&t.Requester!==f.requester)return false;
+  if(f.requester&&canon(t.Requester)!==f.requester)return false;
   return true;
 }
 function groups(){
   if(S.groupBy==='epic'){
-    const g=S.epics.map(e=>({id:e['Epic Key'],title:e.Epic||e['Epic Key'],tag:'Epic // '+e['Epic Key'],color:/^#[0-9a-f]{6}$/i.test(e.Color)?e.Color:''}));
+    const g=S.epics.map(e=>({id:e['Epic Key'],title:e.Epic||e['Epic Key'],tag:(e.Epic||e['Epic Key']),color:/^#[0-9a-f]{6}$/i.test(e.Color)?e.Color:''}));
     const known=new Set(g.map(x=>x.id));
-    if(S.tickets.some(t=>!known.has(t['Epic Key'])))g.push({id:'~none',title:'No epic',tag:'Epic // —',color:''});
+    if(S.tickets.some(t=>!known.has(t['Epic Key'])))g.push({id:'~none',title:'No epic',tag:'No epic',color:''});
     return g;
   }
   if(S.groupBy==='assignee'){
-    const names=[...new Set(S.tickets.map(t=>t.Assignee).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const names=[...new Set(S.tickets.map(t=>canon(t.Assignee)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
     const g=names.map(n=>({id:n,title:n,tag:'Assignee',color:''}));
     if(S.tickets.some(t=>!t.Assignee))g.push({id:'~none',title:'Unassigned',tag:'Assignee',color:''});
     return g;
@@ -341,7 +464,7 @@ function groups(){
 }
 function groupOf(t){
   if(S.groupBy==='epic'){return S.epics.some(e=>e['Epic Key']===t['Epic Key'])?t['Epic Key']:'~none'}
-  if(S.groupBy==='assignee')return t.Assignee||'~none';
+  if(S.groupBy==='assignee')return canon(t.Assignee)||'~none';
   return'~all';
 }
 const cmtCount=()=>{const m={};S.comments.forEach(c=>{m[c['Ticket Key']]=(m[c['Ticket Key']]||0)+1});return m};
@@ -349,36 +472,45 @@ const cmtCount=()=>{const m={};S.comments.forEach(c=>{m[c['Ticket Key']]=(m[c['T
 /* ── Rendering ── */
 function initials(n){const p=String(n).trim().split(/\s+/);return(p.length>1?p[0][0]+p[p.length-1][0]:p[0].slice(0,2)).toUpperCase()}
 function prioHtml(p){
-  const k=low(p);
-  if(k==='highest')return'<span class="p-highest">▲ Highest</span>';
-  if(k==='high')return'<span class="p-high">▲ High</span>';
-  if(k==='medium')return'<span class="p-medium">■ Medium</span>';
-  if(k==='low')return'<span class="p-low">▼ Low</span>';
-  return'<span class="p-none">— Priority</span>';
+  const k=low(p),bars='<i aria-hidden="true"><b></b><b></b><b></b></i>';
+  if(k==='highest')return'<span class="pri p-highest">'+bars+'Highest</span>';
+  if(k==='high')return'<span class="pri p-high">'+bars+'High</span>';
+  if(k==='medium')return'<span class="pri p-medium">'+bars+'Medium</span>';
+  if(k==='low')return'<span class="pri p-low">'+bars+'Low</span>';
+  return'<span class="pri p-none">'+bars+'No priority</span>';
 }
-function typeHtml(t){const k=low(t);const sym=k==='bug'?'✕':k==='feature'?'●':k==='decision'?'◆':'○';return'<span class="typ '+esc(k)+'">'+sym+' '+esc(t||'Task')+'</span>'}
+function typeHtml(t){const k=low(t);return'<span class="typ '+esc(k)+'"><span class="tm" aria-hidden="true"></span>'+esc(t||'Task')+'</span>'}
+const ICON_CMT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+const ICON_DUE='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>';
+const ICON_EYE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_BLOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>';
+const ICON_REL='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
 function cardHtml(t,cc){
   const labs=labelsOf(t);
   return'<div class="card'+(S.sel===t.Key?' sel':'')+(isDone(t.Status)?' done':'')+'" role="button" tabindex="0" data-key="'+esc(t.Key)+'"'+(S.readonly?'':' draggable="true"')+' aria-label="'+esc(t.Key+': '+t.Summary)+'">'
     +'<div class="row sp"><span class="key">'+esc(t.Key)+'</span>'+typeHtml(t.Type)+'</div>'
     +'<div class="sum">'+esc(t.Summary)+'</div>'
+    +(isBlocked(t.Status)&&canBlock()?'<div class="blk"title="'+esc(t['Blocked Reason']||'Blocked')+'">'+ICON_BLOCK+(t['Blocked On']?'Waiting on '+esc(t['Blocked On']):'Blocked: reason missing')+'</div>':'')
     +(labs.length?'<div class="chips">'+labs.map(l=>'<span class="chip">'+esc(l)+'</span>').join('')+'</div>':'')
-    +'<div class="row meta">'+prioHtml(t.Priority)+(cc[t.Key]?'<span class="cc" title="Comments">◈ '+cc[t.Key]+'</span>':'')+((S.rel[t.Key]||[]).length?'<span class="cc" title="Related tickets">⇄ '+S.rel[t.Key].length+'</span>':'')
-    +(t.Assignee?'<span class="who" title="'+esc(t.Assignee)+'">'+esc(initials(t.Assignee))+'</span>':'<span class="who none" title="Unassigned">··</span>')+'</div></div>';
+    +'<div class="row meta">'+prioHtml(t.Priority)+dueHtml(t)+(watchersOf(t).length?'<span class="cc" title="Watchers: '+esc(watchersOf(t).join(', '))+'">'+ICON_EYE+watchersOf(t).length+'</span>':'')+(cc[t.Key]?'<span class="cc" title="Comments">'+ICON_CMT+cc[t.Key]+'</span>':'')+((S.rel[t.Key]||[]).length?'<span class="cc" title="Related tickets">'+ICON_REL+S.rel[t.Key].length+'</span>':'')
+    +(t.Assignee?'<span class="who" title="'+esc(canon(t.Assignee))+'">'+esc(initials(canon(t.Assignee)))+'</span>':'<span class="who none" title="Unassigned">?</span>')+'</div></div>';
 }
 function barHtml(done,total){
-  const pct=total?Math.round(done/total*100):0,n=Math.round(pct/100*20);
-  return'<span class="bar" role="img" aria-label="'+done+' of '+total+' done">[<i>'+'='.repeat(n)+' '.repeat(20-n)+'</i>] <em>'+pct+'%</em></span>';
+  const pct=total?Math.round(done/total*100):0;
+  return'<span class="bar" role="img" aria-label="'+done+' of '+total+' done"><span class="trk"><i style="width:'+pct+'%"></i></span><em>'+pct+'%</em></span>';
 }
 function renderBoard(){
-  const cols=visibleStatuses(),cc=cmtCount();
+  const all_=boardStatuses(),cols=visibleStatuses(),cc=cmtCount();
   if(!S.phoneStatus||!cols.some(c=>c.Status===S.phoneStatus))S.phoneStatus=cols.length?cols[0].Status:null;
   const shown=S.tickets.filter(passes);
-  $('colhead').style.setProperty('--cols',cols.length||1);
-  $('colhead').innerHTML=cols.map(c=>{
+  const tpl=all_.map(c=>isFolded(c)?'52px':'minmax(0,1fr)').join(' ')||'minmax(0,1fr)';
+  $('colhead').style.setProperty('--tpl',tpl);
+  $('colhead').innerHTML=all_.map(c=>{
     const n=shown.filter(t=>statusOf(t)===c.Status).length,lim=parseInt(c['WIP Limit'],10);
+    if(isFolded(c))return'<div class="colh"><button type="button" class="colfold" data-wont="1" aria-label="Show the '+esc(c.Status)+' column ('+n+' ticket'+(n===1?'':'s')+')" title="Show '+esc(c.Status)+'">'+ICON_EYE+String(n).padStart(2,'0')+'</button></div>';
     const over=lim>0&&n>lim;
-    return'<button type="button" class="colbtn'+(over?' over':'')+(S.phoneStatus===c.Status?' pick':'')+'" data-col="'+esc(c.Status)+'">'+esc(c.Status)+' <span class="n">'+String(n).padStart(2,'0')+'</span>'+(lim>0?'<span class="wip">WIP '+n+'/'+lim+'</span>':'')+'</button>';
+    return'<div class="colh"><button type="button" class="colbtn'+(over?' over':'')+(S.phoneStatus===c.Status?' pick':'')+'" data-col="'+esc(c.Status)+'">'+esc(c.Status)+' <span class="n">'+String(n).padStart(2,'0')+'</span>'+(lim>0?'<span class="wip">WIP '+n+'/'+lim+'</span>':'')+'</button>'
+      +(isHideable(c)?'<button type="button" class="colhide" data-wont="1" aria-label="Hide the '+esc(c.Status)+' column" title="Hide '+esc(c.Status)+'">'+ICON_EYE_OFF+'</button>':'')+'</div>';
   }).join('');
   if(!S.tickets.length&&!(S.epics.length&&S.groupBy==='epic')){
     $('lanes').innerHTML='<div class="empty">'+(S.conn==='linking'?'Reading the base…':'No tickets yet.<br>Press + New ticket to add the first one.')+'</div>';
@@ -389,16 +521,17 @@ function renderBoard(){
     if(!all.length&&S.groupBy!=='epic')return'';
     const shut=!!S.collapsed[S.groupBy+':'+g.id];
     const done=all.filter(t=>isDone(t.Status)).length;
-    const cells=shut?'':'<div class="cells" style="--cols:'+(cols.length||1)+'">'+cols.map(c=>{
+    const cells=shut?'':'<div class="cells" style="--tpl:'+tpl+'">'+all_.map(c=>{
       const list=mine.filter(t=>statusOf(t)===c.Status).sort((a,b)=>a._rank-b._rank);
+      if(isFolded(c))return'<div class="cell fold" data-status="'+esc(c.Status)+'" data-group="'+esc(g.id)+'" title="'+esc(c.Status)+': '+list.length+' (drop a card here to move it)"><span class="vt">'+esc(c.Status)+(list.length?' <b>'+list.length+'</b>':'')+'</span></div>';
       return'<div class="cell'+(S.phoneStatus===c.Status?' pick':'')+'" data-status="'+esc(c.Status)+'" data-group="'+esc(g.id)+'">'+list.map(t=>cardHtml(t,cc)).join('')
         +'<button type="button" class="add" data-add="1">+ New ticket</button></div>';
     }).join('')+'</div>';
     return'<section class="lane'+(shut?' shut':'')+'"><div class="lanehead">'
       +'<button type="button" class="tog" data-tog="'+esc(g.id)+'" aria-expanded="'+(!shut)+'" aria-label="'+(shut?'Expand':'Collapse')+' lane '+esc(g.title)+'">'+(shut?'▶':'▼')+'</button>'
       +(g.color?'<span class="sw" style="background:'+g.color+'"></span>':'')
-      +'<span class="lbl" style="font-weight:600">'+esc(g.tag)+'</span><h2>'+esc(g.title)+'</h2>'
-      +'<span class="lbl">'+(mine.length===all.length?all.length:mine.length+' of '+all.length)+' ticket'+(all.length===1?'':'s')+'</span>'
+      +'<span class="lbl'+(S.groupBy==='epic'?' lname':'')+'" style="font-weight:600">'+esc(g.tag)+'</span>'+(S.groupBy==='epic'?'':'<h2>'+esc(g.title)+'</h2>')
+      +'<span class="lbl cnt">'+(mine.length===all.length?all.length:mine.length+' of '+all.length)+' ticket'+(all.length===1?'':'s')+'</span>'
       +'<span class="stc">'+cols.map(c=>{const n=mine.filter(t=>statusOf(t)===c.Status).length;return'<span'+(n?'':' class="zero"')+'>'+esc(c.Status)+' <b>'+n+'</b></span>'}).join('')+'</span>'
       +barHtml(done,all.length)+'</div>'+cells+'</section>';
   }).join('');
@@ -414,15 +547,14 @@ function setOptions(id,items,first,value){
 }
 function renderTools(){
   const f=S.filters,uniq=a=>[...new Set(a.filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  setOptions('fAssignee',uniq(S.tickets.map(t=>t.Assignee)).concat(S.tickets.some(t=>!t.Assignee)?['—']:[]),'All',f.assignee);
+  setOptions('fAssignee',uniq(S.tickets.map(t=>canon(t.Assignee))).concat(S.tickets.some(t=>!t.Assignee)?['—']:[]),'All',f.assignee);
   setOptions('fType',uniq(S.tickets.map(t=>t.Type)),'All',f.type);
   setOptions('fLabel',uniq([].concat(...S.tickets.map(labelsOf))),'All',f.label);
-  setOptions('fRequester',uniq(S.tickets.map(t=>t.Requester)),'All',f.requester);
-  const ppl=people();if(S.me&&!ppl.some(p=>low(p)===low(S.me)))ppl.push(S.me);
-  setOptions('iam',ppl,'Choose…',ppl.find(p=>low(p)===low(S.me))||'');
+  setOptions('fRequester',uniq(S.tickets.map(t=>canon(t.Requester))),'All',f.requester);
+  renderMe();
   $('groupBy').value=S.groupBy;
-  $('mine').classList.toggle('on',f.mine);$('mine').setAttribute('aria-pressed',f.mine);
-  $('wont').textContent="Won't do: "+(S.showWont?'shown':'hidden');$('wont').setAttribute('aria-pressed',S.showWont);
+  $('mine').value=f.mine;$('mine').classList.toggle('on',!!f.mine);
+
   document.body.classList.toggle('ro',S.readonly);
 }
 function fmtWhen(s){const d=new Date(s);if(isNaN(d))return s;return d.toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
@@ -436,7 +568,7 @@ function renderDetail(){
   el.hidden=false;
   const dis=S.readonly?' disabled':'';
   const epicKeys=S.epics.map(e=>e['Epic Key']);
-  el.innerHTML='<div class="dhead"><span class="lbl" style="font-weight:600">'+(isNew?'New ticket':'Detail //')+'</span>'+(isNew?'':'<span class="key">'+esc(t.Key)+'</span>')
+  el.innerHTML='<div class="dhead"><span class="lbl" style="font-weight:600">'+(isNew?'New ticket':'Ticket')+'</span>'+(isNew?'':'<span class="key">'+esc(t.Key)+'</span>')
     +'<button type="button" class="btn sm" data-expand="1" style="margin-left:auto">'+(S.expanded?'Collapse':'Expand')+'</button>'
     +'<button type="button" class="tog" data-close="1" aria-label="Close detail" style="color:var(--text)">✕</button></div>'
     +'<div class="dbody"><form id="dform" class="fld" style="gap:10px" autocomplete="off">'
@@ -446,9 +578,21 @@ function renderDetail(){
     +'<div class="fld"><label class="lbl" for="dEpic">Epic</label><select id="dEpic" class="in"'+dis+'>'+'<option value="">— none —</option>'+S.epics.map(e=>'<option value="'+esc(e['Epic Key'])+'"'+(e['Epic Key']===t['Epic Key']?' selected':'')+'>'+esc(e.Epic)+'</option>').join('')+(t['Epic Key']&&!epicKeys.includes(t['Epic Key'])?'<option selected value="'+esc(t['Epic Key'])+'">'+esc(t['Epic Key'])+'</option>':'')+'</select></div>'
     +'<div class="fld"><label class="lbl" for="dType">Type</label><select id="dType" class="in"'+dis+'>'+opt(TYPES.includes(t.Type)||!t.Type?TYPES:TYPES.concat([t.Type]),t.Type||'Task')+'</select></div>'
     +'<div class="fld"><label class="lbl" for="dPriority">Priority</label><select id="dPriority" class="in"'+dis+'>'+opt(PRIOS.includes(t.Priority)||!t.Priority?PRIOS:PRIOS.concat([t.Priority]),t.Priority,'— none —')+'</select></div>'
-    +'<div class="fld"><label class="lbl" for="dAssignee">Assignee</label><input id="dAssignee" class="in" list="pplList" value="'+esc(t.Assignee)+'"'+dis+'><datalist id="pplList">'+people().map(p=>'<option value="'+esc(p)+'">').join('')+'</datalist></div>'
+    +'<div class="fld"><label class="lbl" for="dAssignee">Assignee</label>'+(teamNames().length
+      ?'<select id="dAssignee" class="in"'+dis+'>'+teamSelOpts(t.Assignee,'Unassigned')+'</select>'
+      :'<input id="dAssignee" class="in" list="pplList" value="'+esc(t.Assignee)+'"'+dis+'>')+'<datalist id="pplList">'+people().map(p=>'<option value="'+esc(p)+'">').join('')+'</datalist></div>'
     +'<div class="fld"><label class="lbl" for="dLabels">Labels</label><input id="dLabels" class="in" placeholder="a; b" value="'+esc(t.Labels)+'"'+dis+'></div>'
+    +(has('Due Date')?'<div class="fld"><label class="lbl" for="dDue">Due date</label><input id="dDue" class="in" type="date" value="'+esc((t['Due Date']||'').slice(0,10))+'"'+dis+'></div>':'')
+    +(!has('Watchers')?'':teamNames().length
+      ?'<div class="fld"><span class="lbl">Watchers</span><input type="hidden" id="dWatchers" value="'+esc(watchersOf(t).join('; '))+'"><div class="wbox" id="wbox">'+wHtml(watchersOf(t),!!dis)+'</div></div>'
+      :'<div class="fld"><label class="lbl" for="dWatchers">Watchers</label><input id="dWatchers" class="in" placeholder="Name; name" value="'+esc(t.Watchers)+'"'+dis+'></div>')
     +'</div>'
+    +(!canBlock()?'':'<div id="blockBox" class="blockbox"'+(isBlocked(t.Status)?'':' hidden')+'><div class="bhead">Blocked: what is it waiting on? (required)</div>'
+    +'<div class="fld"><label class="lbl" for="dBlockReason">Waiting on</label><select id="dBlockReason" class="in"'+dis+'>'+opt(BLOCK_REASONS.includes(t['Blocked Reason'])||!t['Blocked Reason']?BLOCK_REASONS:BLOCK_REASONS.concat([t['Blocked Reason']]),t['Blocked Reason'],'Choose…')+'</select></div>'
+    +'<div class="fld" id="blockOnFld"'+(t['Blocked Reason']?'':' hidden')+'><label class="lbl" for="dBlockOn" id="dBlockOnLbl">'+esc(blockNameLabel(t['Blocked Reason']))+'</label><input id="dBlockOn" class="in" value="'+esc(t['Blocked Reason']==='Waiting on Team Member'&&teamNames().length?'':t['Blocked On'])+'"'+(useTeamBlock(t['Blocked Reason'])?' hidden':'')+dis+'>'
+      +(teamNames().length?'<select id="dBlockOnSel" class="in"'+(useTeamBlock(t['Blocked Reason'])?'':' hidden')+dis+'>'+teamSelOpts(t['Blocked Reason']==='Waiting on Team Member'?t['Blocked On']:'','Choose…')+'</select>':'')
+      +'<datalist id="keyList">'+S.tickets.filter(x=>x.Key!==t.Key).map(x=>'<option value="'+esc(x.Key)+'">'+esc(x.Summary)+'</option>').join('')+'</datalist></div>'
+    +'</div>')
     +'<div class="fld"><label class="lbl" for="dDetails">Details</label><textarea id="dDetails" class="in" rows="4"'+dis+'>'+esc(t.Details)+'</textarea></div>'
     +(isNew?'':'<div class="kv">'
       +(t.Requester?'<span class="lbl">Requester</span><span>'+esc(t.Requester)+'</span>':'')
@@ -467,21 +611,22 @@ function renderComments(){
   if(box.dataset.key!==S.sel||!$('cBody')){
     box.innerHTML='<div id="clist" class="fld" style="gap:10px"></div>'
       +'<form id="cform" class="fld edit-only" style="gap:8px"><label class="lbl" for="cBody" id="cLabel"></label>'
-      +'<textarea id="cBody" class="in" rows="4" placeholder="> _" required></textarea>'
+      +'<textarea id="cBody" class="in" rows="4" placeholder="Write a comment" required></textarea>'
       +'<div class="acts"><button type="submit" class="btn exec">Post</button></div></form>';
     box.dataset.key=S.sel;
     $('cBody').value=S.cdrafts[S.sel]||'';
   }
   const list=S.comments.filter(c=>c['Ticket Key']===S.sel).sort((a,b)=>String(a['Created At (UTC)']).localeCompare(String(b['Created At (UTC)'])));
-  $('clist').innerHTML='<div class="rule">— Comments ('+list.length+') ———</div>'
+  $('clist').innerHTML='<div class="rule">Comments ('+list.length+')</div>'
     +(list.length?list.map(c=>'<div class="cmt"><div class="h"><b>'+esc(c.Author||'Someone')+'</b><span>'+esc(fmtWhen(c['Created At (UTC)']))+'</span></div><div class="b">'+linkify(c.Body)+'</div></div>').join(''):'<div class="lbl">No comments on this ticket yet.</div>');
-  $('cLabel').textContent='Add comment'+(S.me?' as '+S.me:'');
+  $('cLabel').textContent=S.me?'Add comment as '+S.me:isGuest()?'Comments are open to team members only':'Add comment';
+  $('cBody').disabled=isGuest();const sb=$('cform').querySelector('[type=submit]');if(sb)sb.disabled=isGuest();
 }
 function renderRelated(){
   const box=$('rels');if(!box||!S.sel)return;
   if(box.dataset.key!==S.sel||!$('relIn')){
-    box.innerHTML='<div class="rule">— Related tickets ———</div><div id="relchips" class="fld" style="gap:6px"></div>'
-      +'<div class="row edit-only"><input id="relIn" class="in" list="relList" aria-label="Link a ticket by key" placeholder="> link a ticket by key" autocomplete="off"><button type="button" class="btn" data-reladd="1">Link</button></div><datalist id="relList"></datalist>';
+    box.innerHTML='<div class="rule">Related tickets</div><div id="relchips" class="fld" style="gap:6px"></div>'
+      +'<div class="row edit-only"><input id="relIn" class="in" list="relList" aria-label="Link a ticket by key" placeholder="Link a ticket by key" autocomplete="off"><button type="button" class="btn" data-reladd="1">Link</button></div><datalist id="relList"></datalist>';
     box.dataset.key=S.sel;
   }
   const mine=(S.rel[S.sel]||[]).slice().sort((a,b)=>keyNum(a)-keyNum(b));
@@ -559,6 +704,11 @@ async function resolveSchema(){
     if(!t){missing.push(TABLE_NAMES[n]);return}
     TABLES[n]=t.id;F[n]={};(t.fields||[]).forEach(f=>{F[n][String(f.name).trim()]=f.id});
   });
+  Object.keys(OPTIONAL_TABLES).forEach(n=>{
+    const t=tables.find(x=>low(x.name)===low(OPTIONAL_TABLES[n]));
+    if(!t){delete TABLES[n];F[n]={};return}
+    TABLES[n]=t.id;F[n]={};(t.fields||[]).forEach(f=>{F[n][String(f.name).trim()]=f.id});
+  });
   if(missing.length)throw{code:'setup',message:'The Airtable base has no table named '+missing.join(', ')+'. The board needs Tickets, Comments, Epics, and Statuses.'};
   const need=['Key','Summary','Status','Epic Key','Epic','Rank'].filter(f=>!F.tickets[f]);
   if(need.length)throw{code:'setup',message:'The Tickets table is missing the field'+(need.length>1?'s':'')+' '+need.join(', ')+'.'};
@@ -570,7 +720,7 @@ async function loadAll(full){
   try{
     if(full||!S.schemaFresh)await resolveSchema();
     apply('tickets',await read('tickets',{cache:{refresh:true}}));
-    const names=['comments'].concat(full||!S.lookups?['epics','statuses']:[]);
+    const names=['comments'].concat(full||!S.lookups?['epics','statuses'].concat(TABLES.team?['team']:[]):[]);
     const rest=await Promise.all(names.map(n=>read(n,{cache:{refresh:true}}).then(r=>[n,r])));
     rest.forEach(([n,r])=>apply(n,r));
     S.lookups=true;S.conn='ok';notice('');renderAll(S.dirty);startWatch();
@@ -601,8 +751,8 @@ function writeError(e){
   if(c==='server_unavailable'||c==='upstream_error'||c==='cancelled')return['Airtable did not confirm the change. It may or may not have saved; the board has been reloaded to show the base as it is.','warn'];
   return['The change could not be saved.','err'];
 }
-const SELECTS=['Epic Key','Type','Status','Priority'];
-const toCell=(f,v)=>{if(f==='Rank')return typeof v==='number'?v:parseFloat(v);const s=String(v==null?'':v);return s===''&&SELECTS.includes(f)?null:s};
+const SELECTS=['Epic Key','Type','Status','Priority','Blocked Reason'];
+const toCell=(f,v)=>{if(f==='Rank')return typeof v==='number'?v:parseFloat(v);const s=String(v==null?'':v);return s===''&&(SELECTS.includes(f)||f==='Due Date')?null:s};
 async function freshTickets(){return objs('tickets',payloadValues(await read('tickets',{cache:false})))}
 /* changes: {Field:[valueTheViewerSaw|null, newValue]} — null skips the conflict check. One update call per ticket, addressed by record ID. */
 async function writeFields(key,changes){
@@ -630,7 +780,9 @@ async function commit(fn,okMsg){
 function moveTicket(key,status,groupId,beforeKey){
   const t=S.tickets.find(x=>x.Key===key);if(!t||S.busy||S.readonly)return;
   const ch={};
+  if(status!==statusOf(t)&&isBlocked(status)&&canBlock()&&!(t['Blocked Reason']&&t['Blocked On'])){openBlocked(t,status,groupId);return}
   if(status!==statusOf(t))ch.Status=[t.Status,status];
+  if(status!==statusOf(t)&&isBlocked(t.Status)&&!isBlocked(status))['Blocked Reason','Blocked On'].forEach(f=>{if(F.tickets[f]&&t[f])ch[f]=[t[f],'']});
   if(groupId!==groupOf(t)){
     if(S.groupBy==='epic'){const e=S.epics.find(x=>x['Epic Key']===groupId);ch['Epic Key']=[t['Epic Key'],e?e['Epic Key']:''];ch.Epic=[t.Epic,e?e.Epic:'']}
     else if(S.groupBy==='assignee')ch.Assignee=[t.Assignee,groupId==='~none'?'':groupId];
@@ -646,12 +798,61 @@ function moveTicket(key,status,groupId,beforeKey){
   renderBoard();
   commit(()=>writeFields(key,ch),key+' moved');
 }
+const useTeamBlock=r=>r==='Waiting on Team Member'&&teamNames().length>0;
+/* Options for a team-member dropdown; a name on the ticket that is not on the team list stays selectable. */
+function teamSelOpts(cur,first){
+  const c=canon(cur),names=teamNames().slice();if(c&&!names.some(n=>low(n)===low(c)))names.push(c);
+  return'<option value="">'+esc(first)+'</option>'+names.map(n=>'<option value="'+esc(n)+'"'+(low(n)===low(c)?' selected':'')+'>'+esc(n)+'</option>').join('');
+}
+function wHtml(list,ro){
+  const left=teamNames().filter(n=>!list.some(w=>same(w,n)));
+  return'<div class="wchips">'+list.map(n=>'<span class="wchip'+(ro?' ro':'')+'">'+esc(n)+(ro?'':'<button type="button" class="wx" data-wrm="'+esc(n)+'" aria-label="Remove '+esc(n)+' as a watcher">×</button>')+'</span>').join('')+'</div>'
+    +(ro||!left.length?'':'<select id="dWatchAdd" class="in" aria-label="Add a watcher"><option value="">Add watcher…</option>'+left.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('')+'</select>');
+}
+function setWatchers(list){$('dWatchers').value=list.join('; ');$('wbox').innerHTML=wHtml(list,false);S.dirty=true}
+const curWatchers=()=>$('dWatchers').value.split(';').map(s=>s.trim()).filter(Boolean);
+document.addEventListener('change',e=>{if(e.target.id==='dWatchAdd'&&e.target.value){const l=curWatchers();l.push(e.target.value);setWatchers(l);const a=$('dWatchAdd');if(a)a.focus()}});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-wrm]');if(!b)return;setWatchers(curWatchers().filter(n=>n!==b.dataset.wrm));const a=$('dWatchAdd');if(a)a.focus()});
+/* Dropping a ticket on Blocked opens it with Blocked preselected, so the reason can be filled in before saving. */
+function openBlocked(t,status,groupId){
+  select(t.Key);if(S.sel!==t.Key||!$('dStatus'))return;
+  $('dStatus').value=status;
+  if(groupId!==groupOf(t)){
+    if(S.groupBy==='epic')$('dEpic').value=groupId==='~none'?'':groupId;
+    else if(S.groupBy==='assignee')$('dAssignee').value=groupId==='~none'?'':groupId;
+  }
+  S.dirty=true;syncBlockUI();
+  const r=$('dBlockReason');if(r)r.focus();
+  toast('Say what '+t.Key+' is waiting on, then save.','warn');
+}
+function syncBlockUI(){
+  const box=$('blockBox'),st=$('dStatus');if(!box||!st)return;
+  box.hidden=!isBlocked(st.value);
+  const r=$('dBlockReason').value,f=$('blockOnFld'),inp=$('dBlockOn');
+  f.hidden=!r;$('dBlockOnLbl').textContent=blockNameLabel(r);
+  const pre=((S.tickets.map(x=>/^([A-Za-z]+)-\d+$/.exec(x.Key)).find(Boolean)||[])[1])||CONFIG.KEY_PREFIX||'TKT';
+  inp.placeholder=r==='Waiting on Team Member'?'Who?':'Which ticket? e.g. '+pre+'-12';
+  inp.setAttribute('list',r==='Waiting on Team Member'?'pplList':'keyList');
+  const sel=$('dBlockOnSel');if(sel){const t=useTeamBlock(r);sel.hidden=!t;inp.hidden=t;$('dBlockOnLbl').htmlFor=t?'dBlockOnSel':'dBlockOn'}
+}
+const blockOnEl=()=>useTeamBlock($('dBlockReason').value)&&$('dBlockOnSel')?$('dBlockOnSel'):$('dBlockOn');
+document.addEventListener('change',e=>{if(e.target.id==='dStatus'||e.target.id==='dBlockReason'){syncBlockUI();if(e.target.id==='dBlockReason'&&e.target.value)blockOnEl().focus()}});
 function formValues(){
   const ek=$('dEpic').value,e=S.epics.find(x=>x['Epic Key']===ek);
-  return{Summary:$('dSummary').value.trim(),Status:$('dStatus').value,'Epic Key':ek,Epic:e?e.Epic:'',Type:$('dType').value,Priority:$('dPriority').value,Assignee:$('dAssignee').value.trim(),Labels:$('dLabels').value.trim(),Details:$('dDetails').value.trim()};
+  const val=id=>$(id)?$(id).value.trim():'';
+  const v={Summary:val('dSummary'),Status:$('dStatus').value,'Epic Key':ek,Epic:e?e.Epic:'',Type:$('dType').value,Priority:$('dPriority').value,Assignee:val('dAssignee'),Labels:val('dLabels'),Details:val('dDetails')};
+  /* Optional fields go in only when the base has them, so a save never touches a field that does not exist. */
+  if(has('Due Date'))v['Due Date']=val('dDue');
+  if(has('Watchers'))v.Watchers=val('dWatchers');
+  if(canBlock()){const b=isBlocked(v.Status);v['Blocked Reason']=b?val('dBlockReason'):'';v['Blocked On']=b?blockOnEl().value.trim():''}
+  return v;
 }
 async function saveDetail(){
   const v=formValues();if(!v.Summary){toast('A ticket needs a summary.','warn');return}
+  if(canBlock()&&isBlocked(v.Status)&&(!v['Blocked Reason']||!v['Blocked On'])){
+    toast(!v['Blocked Reason']?'A blocked ticket needs to say what it is waiting on.':(v['Blocked Reason']==='Waiting on Team Member'?'Add the team member':'Add the ticket')+' this one is waiting on.','warn');
+    const f=!v['Blocked Reason']?$('dBlockReason'):blockOnEl();if(f)f.focus();return;
+  }
   if(S.sel==='~new'){
     let newKey='';
     const ok=await commit(async()=>{
@@ -674,7 +875,7 @@ async function saveDetail(){
 }
 async function postComment(){
   const body=$('cBody').value.trim(),key=S.sel;if(!body||!key)return;
-  if(!S.me){toast('Choose who you are in the "I am" menu first, so the comment has an author.','warn');$('iam').focus();return}
+  if(!S.me){toast(meHint('comment'),'warn');return}
   const id='C-'+Date.now().toString(36)+'-'+initials(S.me);
   await commit(async()=>{
     await mcp.callTool(SERVER,'create_records_for_table',{baseId:BASE_ID,tableId:TABLES.comments,records:[{fields:{[F.comments['Comment ID']]:id,[F.comments['Ticket Key']]:key,[F.comments.Author]:S.me,[F.comments['Created At (UTC)']]:new Date().toISOString(),[F.comments.Body]:body}}]});
@@ -686,7 +887,7 @@ async function postComment(){
 /* ── Events ── */
 function select(key){if(S.dirty&&S.sel&&S.sel!==key){toast('Unsaved edits on '+(S.sel==='~new'?'the new ticket':S.sel)+' were discarded.','warn')}S.sel=key;S.dirty=false;renderBoard();renderDetail()}
 document.addEventListener('click',e=>{
-  const x=e.target.closest('[data-close],[data-tog],[data-add],[data-col],[data-open],[data-relrm],[data-reladd],[data-expand],[data-del],[data-delno],[data-delyes],#scrim,.card');if(!x)return;
+  const x=e.target.closest('[data-wont],[data-close],[data-tog],[data-add],[data-col],[data-open],[data-relrm],[data-reladd],[data-expand],[data-del],[data-delno],[data-delyes],#scrim,.card');if(!x)return;
   if(x.dataset.del||x.dataset.delno){const b=$('delBox');if(b){b.hidden=!x.dataset.del;if(x.dataset.del)b.scrollIntoView({block:'nearest'})}return}
   if(x.dataset.delyes){deleteTicket();return}
   if(x.id==='scrim'||x.dataset.expand){setExpanded(x.id==='scrim'?false:!S.expanded);return}
@@ -695,6 +896,7 @@ document.addEventListener('click',e=>{
   if(x.dataset.reladd){addRelated();return}
   if(x.dataset.close){S.sel=null;S.draftNew=null;S.dirty=false;renderBoard();renderDetail();return}
   if(x.dataset.tog!=null){const k=S.groupBy+':'+x.dataset.tog;S.collapsed[k]=!S.collapsed[k];store.set('collapsed',S.collapsed);renderBoard();return}
+  if(x.dataset.wont){S.showWont=!S.showWont;store.set('showWont',S.showWont);renderBoard();return}
   if(x.dataset.col){S.phoneStatus=x.dataset.col;renderBoard();return}
   if(x.dataset.add){
     const c=x.closest('.cell'),g=c.dataset.group,epic=S.groupBy==='epic'?S.epics.find(q=>q['Epic Key']===g):null;
@@ -706,8 +908,9 @@ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.tar
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='relIn'){e.preventDefault();addRelated()}});
 /* Expand or collapse the detail panel in place, without redrawing it, so nothing being typed is lost. */
 function startNew(status,epic,assignee){
+  if(isGuest()){toast(meHint('create tickets'),'warn');return}
   const v=visibleStatuses();
-  S.draftNew={Key:'',Summary:'',Status:status||(v.length?v[0].Status:'To Do'),'Epic Key':epic?epic['Epic Key']:'',Epic:epic?epic.Epic:'',Type:'Task',Priority:'',Assignee:assignee||'',Labels:'',Details:''};
+  S.draftNew={Key:'',Summary:'',Status:status||(v.length?v[0].Status:'To Do'),'Epic Key':epic?epic['Epic Key']:'',Epic:epic?epic.Epic:'',Type:'Task',Priority:'',Assignee:assignee||'',Labels:'','Due Date':'',Watchers:'',Details:'','Blocked Reason':'','Blocked On':''};
   select('~new');const s=$('dSummary');if(s)s.focus();
 }
 $('newTicket').addEventListener('click',()=>startNew());
@@ -755,9 +958,8 @@ $('q').addEventListener('input',e=>{S.filters.q=e.target.value;renderBoard()});
 [['fAssignee','assignee'],['fType','type'],['fLabel','label'],['fRequester','requester']].forEach(([id,k])=>$(id).addEventListener('change',e=>{S.filters[k]=e.target.value;renderBoard()}));
 $('groupBy').addEventListener('change',e=>{S.groupBy=e.target.value;store.set('groupBy',S.groupBy);renderBoard()});
 $('themePick').addEventListener('change',e=>{store.set('theme',e.target.value);applyTheme(e.target.value)});
-$('iam').addEventListener('change',e=>{S.me=e.target.value;S.meChosen=!!S.me;store.set('me',S.me);if(!S.me)S.me=guessMe();renderTools();renderBoard();renderComments()});
-$('mine').addEventListener('click',()=>{if(!S.me){toast('Choose who you are in the "I am" menu first.','warn');$('iam').focus();return}S.filters.mine=!S.filters.mine;renderTools();renderBoard()});
-$('wont').addEventListener('click',()=>{S.showWont=!S.showWont;store.set('showWont',S.showWont);renderTools();renderBoard()});
+$('mine').addEventListener('change',e=>{const v=e.target.value;if(v&&!S.me){e.target.value=S.filters.mine;toast(S.userDone?'The board does not know who you are, so it cannot show your tickets.':'Still checking who you are. Try again in a moment.','warn');return}S.filters.mine=v;renderTools();renderBoard()});
+
 $('refresh').addEventListener('click',()=>{if(!mcp){toast('This view has no connector access, so there is nothing to refresh.','warn');return}S.conn=S.tickets.length?S.conn:'linking';renderConn();loadAll(true)});
 
 /* Drag and drop (pointer devices). On touch, status and epic change from the detail panel. */
@@ -769,7 +971,7 @@ lanes.addEventListener('dragover',e=>{if(!S.dragKey)return;const cell=e.target.c
 lanes.addEventListener('drop',e=>{if(!S.dragKey)return;const cell=e.target.closest('.cell');if(!cell)return;e.preventDefault();const c=e.target.closest('.card'),k=S.dragKey;S.dragKey=null;clearHot();moveTicket(k,cell.dataset.status,cell.dataset.group,c?c.dataset.key:null)});
 
 /* ── Boot ── */
-$('proj').textContent='— '+(CONFIG.PROJECT||'Project')+' ———';
+$('proj').textContent=(CONFIG.PROJECT||'Project');
 const sc=store.get('schema',null);
 if(sc&&sc.TABLES&&sc.F){Object.assign(TABLES,sc.TABLES);Object.keys(F).forEach(k=>{F[k]=sc.F[k]||{}})}
 const snap=store.get('snapAt',null);
@@ -777,9 +979,9 @@ if(snap&&snap.raw){S.raw=snap.raw;S.storedAt=snap.at||null;rebuild()}
 renderAll();
 setInterval(renderConn,15000);
 const C=window.claude;
-if(!C||!C.use){S.readonly=true;S.conn=S.tickets.length?'ro':'error';notice('<b>Read-only</b>This copy has no connector access. Open the board in claude.ai to read and edit the base.');renderAll()}
+if(!C||!C.use){S.userDone=true;S.readonly=true;S.conn=S.tickets.length?'ro':'error';notice('<b>Read-only</b>This copy has no connector access. Open the board in claude.ai to read and edit the base.');renderAll()}
 else{
-  C.use('user').then(async u=>{if(!u)return;try{const me=await u.me();S.profileName=me&&me.name||'';if(!S.meChosen){S.me=guessMe();renderTools();renderComments()}}catch(e){}});
+  C.use('user').then(async u=>{try{if(u){const me=await u.me();S.profileName=me&&me.name||'';S.email=me&&me.email||''}}catch(e){}S.userDone=true;resolveMe();renderTools();renderBoard();renderComments()});
   C.use('mcp').then(m=>{
     if(!m){S.readonly=true;S.conn=S.tickets.length?'ro':'error';notice('<b>Read-only view</b>Connector access is unavailable for you here, so the board cannot read or change the base.'+(S.tickets.length?' Showing the last data this browser read.':''));renderAll();return}
     mcp=m;

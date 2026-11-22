@@ -5,7 +5,8 @@
    HOW A THEME WORKS
    board.html holds the layout and reads every colour, font and decoration from the
    variables below. A theme sets them, and may add its own rules after the :root
-   block for anything the variables do not reach.
+   block for anything the variables do not reach. The theme loads after the board's
+   own rules, so those rules win over the board's at equal specificity.
 
    To make a new theme: copy this file to themes/<name>.css (lowercase letters,
    digits and hyphens), change the values, and add <name> to CONFIG.THEMES in
@@ -35,7 +36,10 @@
 
   /* Type */
   --font:'IBM Plex Mono','Space Mono',ui-monospace,'Courier New',monospace;
+  --font-display:var(--font);        /* the board title */
+  --font-data:var(--font);           /* ticket keys, dates and counts */
   --case:uppercase;                  /* labels, buttons, headings; "none" for sentence case */
+  --track:1;                         /* scales the board's letter-spacing; 0 for none */
 
   /* Effects: use "none" to switch any of them off */
   --glow:0 0 8px #00ed3f66,0 0 20px #00ed3f33;        /* box glow on hover and focus */
@@ -49,3 +53,14 @@
   --cut-md:polygon(10px 0%,100% 0%,100% calc(100% - 10px),calc(100% - 10px) 100%,0% 100%,0% 10px);  /* detail panel, notices */
   --cut-lg:polygon(16px 0%,100% 0%,100% calc(100% - 16px),calc(100% - 16px) 100%,0% 100%,0% 16px);  /* lanes, expanded overlay */
 }
+
+/* ── Theme-specific rules ─────────────────────────────────────────
+   Anything the variables do not reach. The board's text is kept plain;
+   these add scifi's terminal-style flourishes around it. */
+h1::before{content:'Board // '}
+h1 em{font-style:normal}
+#proj::before{content:'— '}
+#proj::after{content:' ———'}
+.rule::before{content:'— '}
+.rule::after{content:' ———'}
+.dhead .lbl:has(+ .key)::after{content:' //'}

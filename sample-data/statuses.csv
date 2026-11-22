@@ -1,6 +1,7 @@
 Status,Order,Category,Show As Column,WIP Limit
 To Do,1,To Do,TRUE,
 In Progress,2,In Progress,TRUE,3
-In Review,3,In Progress,TRUE,
-Done,4,Done,TRUE,
-Won't Do,5,Done,FALSE,
+Blocked,3,In Progress,TRUE,
+In Review,4,In Progress,TRUE,
+Done,5,Done,TRUE,
+Won't Do,6,Done,FALSE,

@@ -1,5 +1,5 @@
 {
-  "_note": "Table and field definitions in the shape the Airtable connector's create_base tool expects. Table and field NAMES must stay exactly as written: the board finds them by name. Types may differ. Add the Epic Key choices for whatever epics the project uses.",
+  "_note": "Table and field definitions in the shape the Airtable connector's create_base tool expects. Table and field NAMES must stay exactly as written: the board finds them by name. Types may differ. The Team table and the Due Date, Watchers, Blocked Reason and Blocked On fields are optional: the board hides those features when they are missing. Add the Epic Key choices for whatever epics the project uses.",
   "tables": [
     {
       "name": "Tickets",
@@ -72,6 +72,9 @@
                 "name": "In Progress"
               },
               {
+                "name": "Blocked"
+              },
+              {
                 "name": "In Review"
               },
               {
@@ -135,6 +138,40 @@
           "name": "Related",
           "type": "singleLineText",
           "description": "Keys of related tickets, semicolon-separated. A link stored on one ticket shows on both."
+        },
+        {
+          "name": "Due Date",
+          "type": "date",
+          "options": {
+            "dateFormat": {
+              "name": "iso"
+            }
+          }
+        },
+        {
+          "name": "Watchers",
+          "type": "singleLineText",
+          "description": "Names of people following the ticket, semicolon-separated."
+        },
+        {
+          "name": "Blocked Reason",
+          "type": "singleSelect",
+          "options": {
+            "choices": [
+              {
+                "name": "Blocked by Ticket"
+              },
+              {
+                "name": "Waiting on Team Member"
+              }
+            ]
+          },
+          "description": "Required while Status is Blocked."
+        },
+        {
+          "name": "Blocked On",
+          "type": "singleLineText",
+          "description": "The ticket key or team member name the ticket is waiting on. Required while Status is Blocked."
         }
       ]
     },
@@ -240,6 +277,28 @@
           "type": "number",
           "options": {
             "precision": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team",
+      "description": "Who can use the board. The board matches each viewer's Claude account email to Email. Untick Active to hide someone from the pickers without losing their history.",
+      "fields": [
+        {
+          "name": "Name",
+          "type": "singleLineText"
+        },
+        {
+          "name": "Email",
+          "type": "email"
+        },
+        {
+          "name": "Active",
+          "type": "checkbox",
+          "options": {
+            "icon": "check",
+            "color": "greenBright"
           }
         }
       ]
